@@ -17,7 +17,7 @@ services:
 #    env_file:
 #      - .env
 ##    volumes:
-##      - ./app/static:/home/app/web/static/
+##      - ./app:/home/app/web
 #    depends_on:
 #      postgres:
 #        condition: service_healthy

@@ -1,30 +1,30 @@
+# pull official base image
 FROM python:3.10
 
-# Настройки Poetry
-ENV POETRY_VERSION=1.8.2
-ENV POETRY_HOME=/opt/poetry
-ENV POETRY_VENV=/opt/poetry-venv
-ENV POETRY_CACHE_DIR=/opt/.cache
-# Python переменные
-ENV PYTHONUNBUFFERED=1
-ENV PYTHONDONTWRITEBYTECODE=1
-# Установка Poetry
-RUN python3 -m venv $POETRY_VENV \
-	&& $POETRY_VENV/bin/pip install -U pip setuptools \
-	&& $POETRY_VENV/bin/pip install poetry==${POETRY_VERSION}
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
 
-# Добавление Poetry в PATH
-ENV PATH="${PATH}:${POETRY_VENV}/bin"
+# install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc
 
-WORKDIR /srv/www/education_platform
+# create the appropriate directories
+ENV HOME=/home/app
+ENV APP_HOME=/home/app/web
+RUN mkdir -p $APP_HOME/static
+WORKDIR $APP_HOME
 
-# Установка зависимостей
-COPY poetry.lock pyproject.toml ./
-RUN poetry install
+# install python dependencies
+COPY ./requirements.txt .
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /wheels -r requirements.txt
+RUN pip install --no-cache /wheels/* && rm -rf /wheels
 
-# Запуск приложения
-COPY education /srv/www/education_platform
-EXPOSE 8000
+# copy project
+COPY . $APP_HOME
 
-# Для запуска только контейнера
-#CMD ["poetry", "run", "python", "manage.py", "runserver", "0.0.0.0:8000"]
+# create the app user
+RUN addgroup --system app && adduser --system --group app && \
+    chown -R app:app $APP_HOME
+
+USER app

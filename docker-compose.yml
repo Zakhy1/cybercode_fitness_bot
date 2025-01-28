@@ -1,40 +1,40 @@
 version: '3.9'
 
 services:
-  web:
-    build: ./backend
-    #  place image
-    command: >
-      sh -c "
-      python manage.py makemigrations --noinput &&
-      python manage.py migrate --noinput &&
-      python manage.py runserver 0.0.0.0:8000
-      "
-    ports:
-      - '8000:8000'
-    expose:
-      - 8000
-    env_file:
-      - .env
+#  web:
+#    build: ./app
+#    #  place image
+#    command: >
+#      sh -c "
+#      python manage.py makemigrations --noinput &&
+#      python manage.py migrate --noinput &&
+#      python manage.py runserver 0.0.0.0:8000
+#      "
+#    ports:
+#      - '8000:8000'
+#    expose:
+#      - 8000
+#    env_file:
+#      - .env
+##    volumes:
+##      - ./app/static:/home/app/web/static/
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
+#
+#  redis:
+#    container_name: redis
+#    image: redis
+#    restart: always
 #    volumes:
-#      - ./backend/static:/home/app/web/static/
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-  redis:
-    container_name: redis
-    image: redis
-    restart: always
-    volumes:
-      - redis_data:/data
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
-      interval: 1s
-      timeout: 3s
-      retries: 5
+#      - redis_data:/data
+#    ports:
+#      - "6379:6379"
+#    healthcheck:
+#      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+#      interval: 1s
+#      timeout: 3s
+#      retries: 5
 
   postgres:
     image: postgres:15

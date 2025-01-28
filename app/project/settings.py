@@ -54,8 +54,8 @@ DATABASES = {
         'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
         'PORT': int(os.environ.get('POSTGRES_PORT', '5432')),
         'NAME': os.environ.get('POSTGRES_DB', 'db'),
-        'USER': os.environ.get('POSTGRES_USER', 'db_user'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'qe12332'),
+        'USER': os.environ.get('POSTGRES_USER', 'user'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD', 'password'),
     },
 }
 
@@ -74,7 +74,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = os.environ.get('TZ', 'UTC')
 

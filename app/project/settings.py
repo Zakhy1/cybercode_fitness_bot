@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'settings.apps.SettingsConfig',
     'bot.apps.BotConfig',
 ]
 
@@ -88,3 +89,8 @@ STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+TELEGRAM_TOKEN = "8128031247:AAEjEvqRGSh9eIjsanyTvGLc5YYqdH6Lqqc"
+
+TELEGRAM_API_URL = f'https://api.telegram.org/bot{TELEGRAM_TOKEN}/'
+URL = 'https://3642-149-36-50-230.ngrok-free.app/getpost/'

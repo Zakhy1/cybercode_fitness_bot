@@ -3,18 +3,23 @@ from django.db import models
 
 class Settings(models.Model):
     name = models.CharField(max_length=255, verbose_name="наименование")
-    prefix = models.CharField(max_length=100, verbose_name="префикс", default="general")
-    value = models.CharField(max_length=255, verbose_name="значение", default="")
+    prefix = models.CharField(max_length=100, verbose_name="префикс",
+                              default="general", null=True, blank=True)
+    value = models.CharField(max_length=255, verbose_name="значение",
+                             default="", null=True, blank=True)
 
-    def get_setting(self, name) -> str | None:
+    @classmethod
+    def get_setting(cls, name) -> str | None:
         try:
-            value = self.objects.filter(name=name).first().value
+            value = cls.objects.filter(name=name).first().value
             return value
         except AttributeError:
+            cls.objects.create(name=name)
             return None
 
-    def set_setting(self, name, value) -> None:
-        setting = self.objects.get_or_create(name=name)
+    @classmethod
+    def set_setting(cls, name, value) -> None:
+        setting = cls.objects.get_or_create(name=name)
         setting[0].value = value
         setting[0].save()
 

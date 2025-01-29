@@ -1,3 +1,8 @@
+from .models import Settings
 from django.contrib import admin
 
-# Register your models here.
+
+@admin.register(Settings)
+class SettingsAdmin(admin.ModelAdmin):
+    list_display = ("name", "value")
+    list_editable = ("value",)

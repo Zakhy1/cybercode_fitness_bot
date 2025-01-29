@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from bot.models import UserState
+
+
+@admin.register(UserState)
+class UserStateAdmin(admin.ModelAdmin):
+    pass

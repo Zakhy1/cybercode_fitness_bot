@@ -91,3 +91,11 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CSRF_TRUSTED_ORIGINS = ["https://*", "http://0.0.0.0:8000"]
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'zakhar4443@mail.ru'  # Ваш email на Mail.ru
+EMAIL_HOST_PASSWORD = 'utgLGfsSmbWHggLDdTa7'  # Пароль от вашего email
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

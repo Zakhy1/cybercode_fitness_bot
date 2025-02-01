@@ -22,19 +22,19 @@ services:
 #      postgres:
 #        condition: service_healthy
 #
-#  redis:
-#    container_name: redis
-#    image: redis
-#    restart: always
-#    volumes:
-#      - redis_data:/data
-#    ports:
-#      - "6379:6379"
-#    healthcheck:
-#      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
-#      interval: 1s
-#      timeout: 3s
-#      retries: 5
+  redis:
+    container_name: redis
+    image: redis
+    restart: always
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+      interval: 1s
+      timeout: 3s
+      retries: 5
 
   postgres:
     image: postgres:15
@@ -50,6 +50,33 @@ services:
       timeout: 60s
       retries: 3
       start_period: 10s
+  celery:
+    image: cyber_fitness_bot:latest
+    build: ./app
+    command: celery -A project worker  --autoscale=10,3 -l info
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_started
+    volumes:
+      - ./app:/home/app/web/
+#      web:
+#        condition: service_started
+    restart: always
+
+
+  celery-beat:
+    image: cyber_fitness_bot:latest
+    command: celery -A project beat -l info
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_started
+#      web:
+#        condition: service_started
+    restart: always
 
 volumes:
   postgres_data:

@@ -5,6 +5,8 @@ import random
 import smtplib
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
+
+from bot.tasks import send_email
 from settings.models import Settings
 from bot.models import UserState
 import requests
@@ -50,7 +52,7 @@ def telegram_bot(request):
         elif user_state.state == 'waiting_for_email':
             if "@" in text:  # Простая проверка email
                 code = str(random.randint(100000, 999999))
-                send_email(text, code)  # Отправляем код на почту
+                send_email.delay(text, code)  # Отправляем код на почту
                 send_message("sendMessage", {
                     'chat_id': chat_id,
                     'text': f"Код подтверждения отправлен на {text}. Пожалуйста, введите его."
@@ -138,23 +140,12 @@ def send_message(method, data):
     return response
 
 
-def send_email(email, code):
-    subject = "Код подтверждения для регистрации"
-    message = f"Ваш код подтверждения: {code}"
-    from_email = Settings.get_setting("EMAIL_HOST_USER")  # Если храните email в настройках
-    recipient_list = [email]
-
-    try:
-        send_mail(subject, message, from_email, recipient_list)
-        print(f"Код отправлен на {email}")
-    except Exception as e:
-        print(f"Ошибка при отправке email: {e}")
-
-
 def save_circle(file_id, chat_id):
     telegram_token = Settings.get_setting("TELEGRAM_TOKEN")
     url = TELEGRAM_API_URL + telegram_token + "/getFile"
-    file_path = requests.get(url, params={'file_id': file_id}).json()['result']['file_path']
+    file_path = \
+    requests.get(url, params={'file_id': file_id}).json()['result'][
+        'file_path']
     download_url = f"https://api.telegram.org/file/bot{telegram_token}/{file_path}"
 
     # Скачивание и сохранение файла
@@ -163,6 +154,7 @@ def save_circle(file_id, chat_id):
     os.makedirs(path, exist_ok=True)
     with open(path + datetime.datetime.now().isoformat() + '.mp4', "wb") as f:
         f.write(response.content)
+
 
 def setwebhook(request):
     try:

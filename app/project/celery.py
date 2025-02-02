@@ -1,25 +1,19 @@
 import os
 
 from celery import Celery
+from celery.schedules import crontab
 
-# Установить модуль с настройками. Должна идти до следующей строчки
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
 
 app = Celery('project')
 
-# Позволит создавать настройки для celery в settings.py
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
-# Сканирует все приложения и ищет файл tasks.py
 app.autodiscover_tasks()
 
-# app.conf.beat_schedule = {
-#     'worktime': {
-#         'task': 'apps.main.tasks.create_worktime_data',
-#         'schedule': 30,
-#     },
-# 'scales_control': {
-#     'task': 'apps.main.tasks.create_scales_control_data',
-#     'schedule': 30,
-# },
-# }
+app.conf.beat_schedule = {
+    'notify': {
+        'task': 'bot.tasks.remind_about_cheque',
+        'schedule': crontab(hour=12, minute=0),
+    },
+}

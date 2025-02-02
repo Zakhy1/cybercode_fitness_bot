@@ -27,4 +27,5 @@ COPY . $APP_HOME
 RUN addgroup --system app && adduser --system --group app && \
     chown -R app:app $APP_HOME
 
+
 USER app

@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+import project.logging_settings
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -88,6 +89,9 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CSRF_TRUSTED_ORIGINS = ["https://*", "http://0.0.0.0:8000"]
@@ -100,7 +104,6 @@ EMAIL_HOST_USER = 'zakhar4443@mail.ru'  # Ваш email на Mail.ru
 EMAIL_HOST_PASSWORD = 'utgLGfsSmbWHggLDdTa7'  # Пароль от вашего email
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-
 REDIS_HOST = os.getenv('REDIS_HOST') or "localhost"
 REDIS_PORT = os.getenv('REDIS_PORT') or "6379"
 
@@ -111,3 +114,6 @@ CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
+
+TELEGRAM_API_URL = "https://api.telegram.org/bot"
+

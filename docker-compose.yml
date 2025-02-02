@@ -60,7 +60,7 @@ services:
       redis:
         condition: service_started
     volumes:
-      - ./app:/home/app/web/
+      - ./logs:/app/logs
 #      web:
 #        condition: service_started
     restart: always

@@ -16,8 +16,8 @@ app.conf.beat_schedule = {
         'task': 'bot.tasks.remind_about_cheque',
         'schedule': crontab(hour=14 - 7, minute=0),
     },
-    # 'report': {
-    #     'task': 'bot.tasks.make_report',
-    #     'schedule': crontab(hour=11 - 7, minute=0),
-    # }
+    'report': {
+        'task': 'bot.tasks.make_report',
+        'schedule': crontab(day_of_month=5, hour=11 - 7, minute=0),
+    }
 }

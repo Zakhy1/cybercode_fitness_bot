@@ -1,11 +1,14 @@
 import json
 import random
+import traceback
+
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from bot.bot_util import send_message, save_circle, \
     download_and_save_telegram_file, get_main_keyboard, validate_name, \
     is_corporate_email
+from bot.models.report import Report
 from bot.models.user_state import UserState
 from bot.tasks import send_email
 from project.settings import TELEGRAM_API_URL
@@ -17,6 +20,8 @@ import requests
 def telegram_bot(request):
     if request.method == 'POST':
         message = json.loads(request.body.decode('utf-8'))
+        if "callback_query" in message:
+            handle_callback_query(message)
         chat_id = message['message']['chat']['id']
         text = message['message'].get('text', '')
 
@@ -67,12 +72,6 @@ def telegram_bot(request):
 
         elif user_state.state == 'waiting_for_code':
             if text == user_state.confirmation_code:
-                send_message("sendMessage", {
-                    'chat_id': chat_id,
-                    'text': "Регистрация успешна!",
-                })
-
-                user_state.is_registered = True
                 user_state.state = "waiting_for_name"
                 user_state.save()
 
@@ -87,11 +86,18 @@ def telegram_bot(request):
                     'chat_id': chat_id,
                     'text': "Код неверный. Попробуйте еще раз."
                 })
-        elif user_state.is_registered and user_state.state == "waiting_for_name":
+        elif user_state.state == "waiting_for_name":
             if validate_name(text):
                 user_state.state = ""
+                user_state.is_registered = True
                 user_state.name = text
                 user_state.save()
+
+                send_message("sendMessage", {
+                    'chat_id': chat_id,
+                    'text': "Регистрация успешна!",
+                    'reply_markup': get_main_keyboard(user_state)
+                })
                 send_message("sendMessage", {
                     'chat_id': chat_id,
                     'text': "Теперь Вам необходимо загрузить договор с спортивной организацией и актуальный чек",
@@ -166,6 +172,7 @@ def telegram_bot(request):
                     'reply_markup': get_main_keyboard(user_state)
                 })
 
+
         else:
             send_message("sendMessage", {
                 'chat_id': chat_id,
@@ -184,3 +191,49 @@ def setwebhook(request):
         return HttpResponse(f"{response}")
     except Exception as e:
         return HttpResponse(f"Not set: {str(e)}")
+
+
+def handle_callback_query(message):
+    callback_data = message["callback_query"]["data"]
+    chat_id = message["callback_query"]["message"]["chat"]["id"]
+    user = UserState.objects.get(chat_id=chat_id)
+
+    # Add a debug log to inspect callback_data
+    print(f"Callback Data: {callback_data}")
+
+    if callback_data.startswith("confirm_report_"):
+        report_id_str = callback_data.split("_")[-1]
+
+        # Debug log to inspect the part being split
+        print(f"Report ID Part: {report_id_str}")
+
+        if report_id_str.lower() == 'none':
+            send_message("sendMessage", {
+                'chat_id': chat_id,
+                'text': "Ошибка: данные отчета не указаны!"
+            })
+            return HttpResponse('ok')
+
+        try:
+            report_id = int(report_id_str)
+            report = Report.objects.get(id=report_id)
+
+            if user in report.confirmed_by.all():
+                send_message("sendMessage", {
+                    'chat_id': chat_id,
+                    'text': "Вы уже подтвердили получение отчета!"
+                })
+            else:
+                report.confirm_report(user)
+                send_message("sendMessage", {
+                    'chat_id': chat_id,
+                    'text': "✅ Отчет успешно подтвержден!"
+                })
+        except ValueError:
+            print(traceback.format_exc())
+            send_message("sendMessage", {
+                'chat_id': chat_id,
+                'text': "Ошибка: неверный формат данных отчета!"
+            })
+
+    return HttpResponse('ok')

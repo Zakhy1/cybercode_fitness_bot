@@ -9,13 +9,13 @@ class Settings(models.Model):
                              default="", null=True, blank=True)
 
     @classmethod
-    def get_setting(cls, name) -> str | None:
+    def get_setting(cls, name: str, default: str = "") -> str | None:
         try:
             value = cls.objects.filter(name=name).first().value
             return value
         except AttributeError:
-            cls.objects.create(name=name)
-            return None
+            cls.objects.create(name=name, value=default)
+            return default
 
     @classmethod
     def set_setting(cls, name, value) -> None:

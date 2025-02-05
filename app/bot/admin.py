@@ -3,6 +3,7 @@ from django.contrib import admin
 from bot.models.cheque import Cheque
 from bot.models.circle import Circle
 from bot.models.contract import Contract
+from bot.models.report import Report
 from bot.models.user_state import UserState
 
 
@@ -26,3 +27,6 @@ class CircleAdmin(admin.ModelAdmin):
     pass
 
 
+@admin.register(Report)
+class ReportAdmin(admin.ModelAdmin):
+    pass

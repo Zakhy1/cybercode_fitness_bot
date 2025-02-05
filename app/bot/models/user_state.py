@@ -9,9 +9,9 @@ class UserState(models.Model):
     confirmation_code = models.CharField(max_length=6, null=True, blank=True)
     is_registered = models.BooleanField(default=False)
     has_contract = models.BooleanField(default=False)
-    receive_notifications = models.BooleanField(default=False)
     updated_at = models.DateTimeField(auto_now=True)
     send_reports = models.BooleanField(default=False)
+
     def __str__(self):
         return f"{self.name}. сhat ID: {self.chat_id}"
 

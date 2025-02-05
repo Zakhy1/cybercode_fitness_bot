@@ -4,7 +4,8 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from bot.bot_util import send_message, save_circle, \
-    download_and_save_telegram_file, get_main_keyboard
+    download_and_save_telegram_file, get_main_keyboard, validate_name, \
+    is_corporate_email
 from bot.models.user_state import UserState
 from bot.tasks import send_email
 from project.settings import TELEGRAM_API_URL
@@ -47,7 +48,7 @@ def telegram_bot(request):
             user_state.save()
 
         elif user_state.state == 'waiting_for_email':
-            if "@cybercode.pro" in text:  # Простая проверка email
+            if is_corporate_email(text):
                 code = str(random.randint(100000, 999999))
                 send_email.delay(text, code)  # Отправляем код на почту
                 send_message("sendMessage", {
@@ -72,12 +73,12 @@ def telegram_bot(request):
                 })
 
                 user_state.is_registered = True
-                user_state.state = None
+                user_state.state = "waiting_for_name"
                 user_state.save()
 
                 send_message("sendMessage", {
                     'chat_id': chat_id,
-                    'text': "Теперь Вам необходимо загрузить договор с спортивной организацией и актуальный чек",
+                    'text': "Теперь введите Ваше имя.\nНапример: 'Пётр Петрович Петров' или 'Иван Иванов'",
                     'reply_markup': get_main_keyboard(user_state)
                 })
 
@@ -86,10 +87,27 @@ def telegram_bot(request):
                     'chat_id': chat_id,
                     'text': "Код неверный. Попробуйте еще раз."
                 })
-
+        elif user_state.is_registered and user_state.state == "waiting_for_name":
+            if validate_name(text):
+                user_state.state = ""
+                user_state.name = text
+                user_state.save()
+                send_message("sendMessage", {
+                    'chat_id': chat_id,
+                    'text': "Теперь Вам необходимо загрузить договор с спортивной организацией и актуальный чек",
+                    'reply_markup': get_main_keyboard(user_state)
+                })
+            else:
+                send_message("sendMessage", {
+                    'chat_id': chat_id,
+                    'text': "Введенное имя некорректно. Попробуйте еще раз.",
+                    'reply_markup': get_main_keyboard(user_state)
+                })
         elif 'video_note' in message['message']:  # Обработка кружков
             if user_state.is_registered:
                 file_id = message['message']['video_note']['file_id']
+                download_and_save_telegram_file(file_id, user_state,
+                                                "circle")
                 save_circle(file_id, chat_id)  # Функция для сохранения кружка
                 send_message("sendMessage", {
                     'chat_id': chat_id,
@@ -118,9 +136,7 @@ def telegram_bot(request):
             user_state.save()
 
 
-
         elif 'document' in message['message']:
-
             file_id = message['message']['document']['file_id']
 
             if user_state.state == 'waiting_for_contract':

@@ -24,18 +24,18 @@ def send_email(email, code):
 
 
 @shared_task
-def send_notify_to_users():
-    users = UserState.objects.all()
-    for user in users:
-        send_message_to_user.delay(user.chat_id, "message")
-
-
-@shared_task
 def send_message_to_user(chat_id, message):
     send_message("sendMessage", {
         'chat_id': chat_id,
         'text': message
     })
+
+
+@shared_task
+def send_notify_to_users():
+    users = UserState.objects.all()
+    for user in users:
+        send_message_to_user.delay(user.chat_id, "message")
 
 
 @shared_task
@@ -48,7 +48,11 @@ def remind_about_cheque():
             '-uploaded_at').first()
 
         if not last_receipt or last_receipt.uploaded_at < last_month:
-            send_message("sendMessage", {
-                'chat_id': user.chat_id,
-                'text': "Пожалуйста, загрузите новый чек за текущий месяц!"
-            })
+            send_message_to_user.delay(
+                user.chat_id,
+                "Пожалуйста, загрузите новый чек за текущий месяц!"
+            )
+
+@shared_task
+def make_report():
+    users_to_send_report = UserState.objects.filter()

@@ -1,11 +1,13 @@
 import datetime
 import json
 import os
+import re
 
 import requests
 from django.core.files.base import ContentFile
 
 from bot.models.cheque import Cheque
+from bot.models.circle import Circle
 from bot.models.contract import Contract
 from settings.models import Settings
 from project.settings import TELEGRAM_API_URL
@@ -78,6 +80,12 @@ def download_and_save_telegram_file(file_id, user, model):
         receipt.save()
         return receipt.file.url
 
+    elif model == "circle":
+        circle = Circle(user=user)
+        circle.file.save(filename, ContentFile(file_data))
+        circle.save()
+        return circle.file.url
+
     return None
 
 
@@ -99,3 +107,13 @@ def get_main_keyboard(user_state):
         "resize_keyboard": True,
         "one_time_keyboard": True
     })
+
+
+def validate_name(name):
+    pattern = r'^[А-ЯЁ][а-яё]+(?:-[А-ЯЁ][а-яё]+)? [А-ЯЁ][а-яё]+(?:-[А-ЯЁ][а-яё]+)?(?: [А-ЯЁ][а-яё]+(?:-[А-ЯЁ][а-яё]+)?)?$'
+    return bool(re.fullmatch(pattern, name)) and len(name) <= 254
+
+
+def is_corporate_email(email):
+    pattern = r'^[a-zA-Z0-9._%+-]+@cybercode\.pro$'
+    return bool(re.fullmatch(pattern, email))

@@ -14,6 +14,10 @@ app.autodiscover_tasks()
 app.conf.beat_schedule = {
     'notify': {
         'task': 'bot.tasks.remind_about_cheque',
-        'schedule': crontab(hour=12, minute=0),
+        'schedule': crontab(hour=14 - 7, minute=0),
     },
+    # 'report': {
+    #     'task': 'bot.tasks.make_report',
+    #     'schedule': crontab(hour=11 - 7, minute=0),
+    # }
 }

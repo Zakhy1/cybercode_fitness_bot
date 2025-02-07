@@ -3,7 +3,7 @@ version: '3.9'
 services:
   web:
     build: ./app
-    image: repcofkk:latest
+    image: cyber_fitness_bot:latest
     command: >
       sh -c "
       python manage.py makemigrations --noinput &&

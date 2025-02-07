@@ -97,11 +97,10 @@ CSRF_TRUSTED_ORIGINS = ["https://lirchzakhar.fvds.ru/", "http://0.0.0.0:8000"]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.yandex.ru'
-EMAIL_PORT = 465
+EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')  # Ваш email на Mail.ru
-EMAIL_HOST_PASSWORD = os.getenv(
-    'EMAIL_HOST_PASSWORD')  # Пароль от вашего email
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')  # Пароль от вашего email
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 SERVER_EMAIL = EMAIL_HOST_USER

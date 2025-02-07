@@ -93,7 +93,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CSRF_TRUSTED_ORIGINS = ["https://lirchzakhar.fvds.ru/", "http://0.0.0.0:8000"]
+CSRF_TRUSTED_ORIGINS = ["https://lirchzakhar.fvds.ru", "http://0.0.0.0:8000"]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.yandex.ru'

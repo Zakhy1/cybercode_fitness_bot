@@ -50,6 +50,7 @@ services:
       timeout: 60s
       retries: 3
       start_period: 10s
+    restart: always
   celery:
     image: cyber_fitness_bot:latest
     build: ./app

@@ -175,3 +175,5 @@ cython_debug/
 #.idea/
 
 app/logs
+
+app/project/local_settings.py

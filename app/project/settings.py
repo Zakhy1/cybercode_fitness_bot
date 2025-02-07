@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+
 # import project.logging_settings
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -95,13 +96,16 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CSRF_TRUSTED_ORIGINS = ["https://lirchzakhar.fvds.ru/", "http://0.0.0.0:8000"]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.mail.ru'
-EMAIL_PORT = 587
+EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_PORT = 465
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')  # Ваш email на Mail.ru
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')  # Пароль от вашего email
+EMAIL_HOST_PASSWORD = os.getenv(
+    'EMAIL_HOST_PASSWORD')  # Пароль от вашего email
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+SERVER_EMAIL = EMAIL_HOST_USER
+EMAIL_ADMIN = EMAIL_HOST_USER
 REDIS_HOST = os.getenv('REDIS_HOST') or "localhost"
 REDIS_PORT = os.getenv('REDIS_PORT') or "6379"
 

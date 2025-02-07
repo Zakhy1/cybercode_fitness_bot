@@ -117,3 +117,5 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
 TELEGRAM_API_URL = "https://api.telegram.org/bot"
+
+import project.logging_settings

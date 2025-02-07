@@ -61,5 +61,5 @@ error_logger = setup_logger("error_logger", logging.ERROR,
 cleanup_old_logs(log_dir, log_retention_days)
 
 # Тест логов
-# info_logger.info("Это информационное сообщение")
-# error_logger.error("Это сообщение об ошибке")
+info_logger.info("Это информационное сообщение")
+error_logger.error("Это сообщение об ошибке")

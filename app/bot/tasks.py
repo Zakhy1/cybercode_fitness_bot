@@ -8,11 +8,14 @@ from bot.bot_util import send_message
 from bot.models.cheque import Cheque
 from bot.models.circle import Circle
 from bot.models.contract import Contract
+from bot.models.report import Report
 from bot.models.user_state import UserState
+from project.logging_settings import info_logger, error_logger
 from project.settings import EMAIL_HOST_USER
 from settings.models import Settings
 
-
+info_logger.info("Это информационное сообщение1")
+error_logger.error("Это сообщение об ошибке1")
 @shared_task
 def send_email(email, code):
     subject = "Код подтверждения для регистрации"
@@ -57,71 +60,7 @@ def remind_about_cheque():
 
 @shared_task
 def make_report():
-    # Создание отчета
-    today = now().date()
-    first_day_of_current_month = today.replace(day=1)
-    first_day_of_previous_month = (
-            first_day_of_current_month - timedelta(days=1)).replace(day=1)
-    start_str = first_day_of_previous_month.strftime("%d.%m.%Y")
-    required_count = int(Settings.get_setting("circle_required_count", "4"))
-    host_url = Settings.get_setting("HOST_URL", "http://localhost:8000")
+    info_logger.info("Это информационное сообщение1")
+    error_logger.error("Это сообщение об ошибке1")
 
-    report = [
-        {
-            "chat_id": 389838514,
-            "text": f"Отчет от {start_str}",
-        }
-    ]
-
-    users = UserState.objects.all()
-
-    for user in users:
-        # Отсеиваем
-        if not user.is_registered:
-            print(f"{user.name} - Не зарегистрирован")
-            continue
-        if not user.has_contract:
-            print(f"{user.name} - Не имеет договор")
-            continue
-        user_circes_count = Circle.objects.filter(
-            uploaded_at__gte=first_day_of_previous_month,
-            user=user).count()
-        if user_circes_count < required_count:
-            print(
-                f"{user.name} - Количество кружок {user_circes_count}, а необходимо: {required_count} ")
-            continue
-        try:
-            latest_cheque = Cheque.objects.filter(
-                uploaded_at__gte=first_day_of_previous_month,
-                user=user).latest("uploaded_at")
-        except Cheque.DoesNotExist:
-            existent_cheque = Cheque.objects.filter(user=user).order_by(
-                "uploaded_at").last()
-            if existent_cheque.exists():
-                print(
-                    f"{user.name} - Нет чека за месяц (Последний от {existent_cheque.uploaded_at})")
-            else:
-                print(f"{user.name} - Нет чека за месяц")
-            continue
-        # Добавляем в отчет
-        latest_contract = Contract.objects.latest('uploaded_at')
-        report.append({
-            "chat_id": int(Settings.get_setting("admin_chat_id", "389838514")),
-            "text": user.get_name(),
-            "disable_notification": True,
-            "reply_markup": {
-                "inline_keyboard": [
-                    [{
-                        "text": "📥 Договор",
-                        "url": f'{host_url}{latest_contract.file.url}',
-                    }],
-                    [{
-                        "text": "📥 Последний чек",
-                        "url": f'{host_url}{latest_cheque.file.url}',
-                    }]
-                ]
-            }
-        })
-    for row in report:
-        send_message_to_user_generic.delay(row)
-
+    Report.create_and_send()

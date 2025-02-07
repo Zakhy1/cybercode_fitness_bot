@@ -1,27 +1,27 @@
 version: '3.9'
 
 services:
-#  web:
-#    build: ./app
-#    #  place image
-#    command: >
-#      sh -c "
-#      python manage.py makemigrations --noinput &&
-#      python manage.py migrate --noinput &&
-#      python manage.py runserver 0.0.0.0:8000
-#      "
-#    ports:
-#      - '8000:8000'
-#    expose:
-#      - 8000
-#    env_file:
-#      - .env
-##    volumes:
-##      - ./app:/home/app/web
-#    depends_on:
-#      postgres:
-#        condition: service_healthy
-#
+  web:
+    build: ./app
+    image: repcofkk:latest
+    command: >
+      sh -c "
+      python manage.py makemigrations --noinput &&
+      python manage.py migrate --noinput &&
+      gunicorn --workers=2 project.wsgi:application --bind 0.0.0.0:8000
+      "
+    ports:
+      - '8000:8000'
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./app/static:/home/app/web/static/
+    restart: always
+
+
   redis:
     container_name: redis
     image: redis
@@ -56,13 +56,14 @@ services:
     command: celery -A project worker  --autoscale=10,3 -l info
     env_file:
       - .env
+    volumes:
+      - ./app/logs:/home/app/web/logs
+      - ./app/media:/home/app/web/media
     depends_on:
       redis:
         condition: service_started
-    volumes:
-      - ./logs:/app/logs
-#      web:
-#        condition: service_started
+      web:
+        condition: service_started
     restart: always
 
 
@@ -74,8 +75,8 @@ services:
     depends_on:
       redis:
         condition: service_started
-#      web:
-#        condition: service_started
+      web:
+        condition: service_started
     restart: always
 
 volumes:

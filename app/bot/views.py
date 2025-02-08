@@ -146,7 +146,7 @@ def telegram_bot(request):
 
             if latest_contract:
                 inline_keyboard.append([{
-                    "text": f"📥 Договор (загружен {latest_contract.uploaded_at.strftime("%d.%m.%Y")})",
+                    "text": f"📥 Договор (загружен {latest_contract.uploaded_at.strftime('%d.%m.%Y')})",
                     "url": f'{host_url}{latest_contract.file.url}',
                 }])
             else:
@@ -157,7 +157,7 @@ def telegram_bot(request):
             if latest_cheque:
                 inline_keyboard.append(
                     [{
-                        "text": f"📥 Последний чек (загружен {latest_contract.uploaded_at.strftime("%d.%m.%Y")})",
+                        "text": f"📥 Последний чек (загружен {latest_contract.uploaded_at.strftime('%d.%m.%Y')})",
                         "url": f'{host_url}{latest_cheque.file.url}',
                     }]
                 )

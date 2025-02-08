@@ -102,7 +102,8 @@ def get_main_keyboard(user_state):
     return json.dumps({
         "keyboard": [
             [{"text": contract_button}],
-            [{"text": cheque_button}]
+            [{"text": cheque_button}],
+            [{"text": "Узнать свой статус"}]
         ],
         "resize_keyboard": True,
         "one_time_keyboard": True
@@ -117,3 +118,27 @@ def validate_name(name):
 def is_corporate_email(email):
     pattern = r'^[a-zA-Z0-9._%+-]+@cybercode\.pro$'
     return bool(re.fullmatch(pattern, email))
+
+
+def calc_timedelta_between_dates(date_1, date_2) -> str:
+    delta = date_1 - date_2
+
+    seconds = delta.total_seconds()
+    years, remainder = divmod(seconds, 60 * 60 * 24 * 365)
+    months, remainder = divmod(remainder, 60 * 60 * 24 * 30)
+    days, remainder = divmod(remainder, 60 * 60 * 24)
+    hours, remainder = divmod(remainder, 60 * 60)
+    minutes, seconds = divmod(remainder, 60)
+
+    if years >= 1:
+        return f"{int(years)} год" if years == 1 else f"{int(years)} года" if 2 <= years <= 4 else f"{int(years)} лет"
+    elif months >= 1:
+        return f"{int(months)} месяц" if months == 1 else f"{int(months)} мес." if 2 <= months <= 4 else f"{int(months)} месяцев"
+    elif days >= 1:
+        return f"{int(days)} день" if days == 1 else f"{int(days)} дн." if 2 <= days <= 4 else f"{int(days)} дней"
+    elif hours >= 1:
+        return f"{int(hours)} час" if hours == 1 else f"{int(hours)} ч." if 2 <= hours <= 4 else f"{int(hours)} часов"
+    elif minutes >= 1:
+        return f"{int(minutes)} минута" if minutes == 1 else f"{int(minutes)} мин." if 2 <= minutes <= 4 else f"{int(minutes)} минут"
+    else:
+        return f"{int(seconds)} секунда" if seconds == 1 else f"{int(seconds)} сек." if 2 <= seconds <= 4 else f"{int(seconds)} секунд"

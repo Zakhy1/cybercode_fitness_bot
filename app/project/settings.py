@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 
 # import project.logging_settings
+DEBUG = os.getenv("DEBUG", True)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -100,7 +101,8 @@ EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')  # Ваш email на Mail.ru
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')  # Пароль от вашего email
+EMAIL_HOST_PASSWORD = os.getenv(
+    'EMAIL_HOST_PASSWORD')  # Пароль от вашего email
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 SERVER_EMAIL = EMAIL_HOST_USER
@@ -119,8 +121,3 @@ CELERY_RESULT_SERIALIZER = 'json'
 TELEGRAM_API_URL = "https://api.telegram.org/bot"
 
 import project.logging_settings
-
-try:
-    import project.local_settings
-except ImportError:
-    import project.production_settings

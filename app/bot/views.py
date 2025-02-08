@@ -1,19 +1,25 @@
+import datetime
 import json
 import random
 import traceback
 
 from django.http import HttpResponse
+from django.utils.timezone import now
 from django.views.decorators.csrf import csrf_exempt
 
 from bot.bot_util import send_message, save_circle, \
     download_and_save_telegram_file, get_main_keyboard, validate_name, \
-    is_corporate_email
+    is_corporate_email, calc_timedelta_between_dates
+from bot.models.cheque import Cheque
+from bot.models.circle import Circle
+from bot.models.contract import Contract
 from bot.models.report import Report
 from bot.models.user_state import UserState
 from bot.tasks import send_email, send_message_to_user_generic
 from project.settings import TELEGRAM_API_URL
 from settings.models import Settings
 import requests
+from django.utils import timezone
 
 
 @csrf_exempt
@@ -77,8 +83,7 @@ def telegram_bot(request):
 
                 send_message("sendMessage", {
                     'chat_id': chat_id,
-                    'text': "Теперь введите Ваше имя.\nНапример: 'Пётр Петрович Петров' или 'Иван Иванов'",
-                    'reply_markup': get_main_keyboard(user_state)
+                    'text': "Теперь введите Ваше имя.\nНапример: 'Петров Пётр Петрович' или 'Иван Иванов'",
                 })
 
             else:
@@ -96,7 +101,6 @@ def telegram_bot(request):
                 send_message("sendMessage", {
                     'chat_id': chat_id,
                     'text': "Регистрация успешна!",
-                    'reply_markup': get_main_keyboard(user_state)
                 })
                 send_message("sendMessage", {
                     'chat_id': chat_id,
@@ -107,24 +111,78 @@ def telegram_bot(request):
                 send_message("sendMessage", {
                     'chat_id': chat_id,
                     'text': "Введенное имя некорректно. Попробуйте еще раз.",
-                    'reply_markup': get_main_keyboard(user_state)
-                })
-        elif 'video_note' in message['message']:  # Обработка кружков
-            if user_state.is_registered:
-                file_id = message['message']['video_note']['file_id']
-                download_and_save_telegram_file(file_id, user_state,
-                                                "circle")
-                save_circle(file_id, chat_id)  # Функция для сохранения кружка
-                send_message("sendMessage", {
-                    'chat_id': chat_id,
-                    'text': "Кружок получен и сохранен на сервере."
-                })
-            else:
-                send_message("sendMessage", {
-                    'chat_id': chat_id,
-                    'text': "Вы не зарегистрированы, чтобы отправлять кружки!"
                 })
 
+        elif not user_state.is_registered:
+            send_message("sendMessage", {
+                'chat_id': chat_id,
+                'text': "Вы не зарегистрированы"
+            })
+        elif text == "Узнать свой статус":
+            today = timezone.now().date()
+            first_day_of_current_month = today.replace(day=1)
+            first_day_of_previous_month = (
+                    first_day_of_current_month - datetime.timedelta(
+                days=1)).replace(
+                day=1)
+            host_url = Settings.get_setting("HOST_URL",
+                                            "http://localhost:8000")
+
+            send_message("sendMessage", {
+                'chat_id': chat_id,
+                'text': f"Ваше имя: {user_state.name}"
+            })
+
+            inline_keyboard = []
+
+            user_contracts = Contract.objects.filter(user=user_state).order_by(
+                "uploaded_at")
+            latest_contract = user_contracts.last()
+
+            user_cheques = Cheque.objects.filter(user=user_state).order_by(
+                "uploaded_at"
+            )
+            latest_cheque = user_cheques.last()
+
+            if latest_contract:
+                inline_keyboard.append([{
+                    "text": f"📥 Договор (загружен {latest_contract.uploaded_at.strftime("%d.%m.%Y")})",
+                    "url": f'{host_url}{latest_contract.file.url}',
+                }])
+            else:
+                inline_keyboard.append([{
+                    "text": "Загрузить договор",
+                }])
+
+            if latest_cheque:
+                inline_keyboard.append(
+                    [{
+                        "text": f"📥 Последний чек (загружен {latest_contract.uploaded_at.strftime("%d.%m.%Y")})",
+                        "url": f'{host_url}{latest_cheque.file.url}',
+                    }]
+                )
+            else:
+                inline_keyboard.append({
+                    "text": "Загрузить чек",
+                })
+
+            send_message("sendMessage", {
+                'chat_id': chat_id,
+                'text': f"Документы, необходимые для компенсации",
+                "reply_markup": {
+                    "inline_keyboard": inline_keyboard
+                }
+            })
+
+            required_count = int(
+                Settings.get_setting("circle_required_count", "4"))
+            user_circes_count = Circle.objects.filter(
+                uploaded_at__gte=first_day_of_previous_month,
+                user=user_state).count()
+            send_message("sendMessage", {
+                'chat_id': chat_id,
+                'text': f"Кружки: {user_circes_count}/{required_count}",
+            })
         elif text == "Загрузить договор":
             send_message("sendMessage", {
                 'chat_id': chat_id,
@@ -134,6 +192,21 @@ def telegram_bot(request):
             user_state.save()
 
         elif text == "Загрузить чек":
+            send_message("sendMessage", {
+                'chat_id': chat_id,
+                'text': "Отправьте PDF-файл с чеком."
+            })
+            user_state.state = 'waiting_for_receipt'
+            user_state.save()
+
+        elif text == "Изменить договор":
+            send_message("sendMessage", {
+                'chat_id': chat_id,
+                'text': "Отправьте PDF-файл с договором."
+            })
+            user_state.state = 'waiting_for_contract'
+            user_state.save()
+        elif text.startswith("Загрузить чек"):
             send_message("sendMessage", {
                 'chat_id': chat_id,
                 'text': "Отправьте PDF-файл с чеком."
@@ -160,7 +233,6 @@ def telegram_bot(request):
                     # Обновляем кнопку
                 })
 
-
             elif user_state.state == 'waiting_for_receipt':
                 download_and_save_telegram_file(file_id, user_state, "receipt")
                 user_state.state = None
@@ -172,6 +244,32 @@ def telegram_bot(request):
                     'reply_markup': get_main_keyboard(user_state)
                 })
 
+        elif 'video_note' in message['message']:  # Обработка кружков
+            now_date_minus_day = timezone.now() - datetime.timedelta(
+                hours=24)
+            file_id = message['message']['video_note']['file_id']
+            user_today_circles = Circle.objects.filter(
+                user=user_state,
+                uploaded_at__gte=now_date_minus_day).order_by(
+                "uploaded_at")
+            if user_today_circles.exists():
+                latest_circle_date = user_today_circles.last().uploaded_at
+                wait_timedelta = calc_timedelta_between_dates(
+                    now_date_minus_day, latest_circle_date)
+                send_message("sendMessage", {
+                    'chat_id': chat_id,
+                    'text': f"Вы уже загружали кружок недавно. Подождите {wait_timedelta}"
+                })
+            else:
+                download_and_save_telegram_file(file_id, user_state,
+                                                "circle")
+                save_circle(file_id,
+                            chat_id)  # Функция для сохранения кружка
+                send_message("sendMessage", {
+                    'chat_id': chat_id,
+                    'text': "Кружок получен и сохранен на сервере."
+                })
+            return HttpResponse('ok')
 
         else:
             send_message("sendMessage", {

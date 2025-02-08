@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 
 # import project.logging_settings
-DEBUG = bool(os.getenv("DEBUG", True))
+DEBUG = bool(int(os.getenv("DEBUG", True)))
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 

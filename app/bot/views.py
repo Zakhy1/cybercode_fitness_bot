@@ -11,7 +11,7 @@ from settings.models import Settings
 from bot.core.base import handle_callback_query
 from bot.core.main import TelegramBotHandler
 from bot.tasks import send_message
-from bot.util import base_view
+from bot.util.base_view import base_view
 
 import requests
 

@@ -18,7 +18,8 @@ services:
       postgres:
         condition: service_healthy
     volumes:
-      - ./app/static:/home/app/web/static/
+      - ./app/static:/home/app/web/static
+      - ./app/media:/home/app/web/media
     restart: always
 
 

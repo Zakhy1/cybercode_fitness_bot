@@ -18,6 +18,7 @@ services:
       postgres:
         condition: service_healthy
     volumes:
+      - ./app/logs:/home/app/web/logs
       - ./app/media:/home/app/web/media
     restart: always
 
@@ -53,7 +54,6 @@ services:
     restart: always
   celery:
     image: cyber_fitness_bot:latest
-    build: ./app
     command: celery -A project worker  --autoscale=10,3 -l info
     env_file:
       - .env

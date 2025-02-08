@@ -3,21 +3,19 @@ import json
 import random
 import logging
 
-from bot.core.base import send_message, save_circle, \
-    download_and_save_telegram_file, get_main_keyboard, validate_name, \
+from bot.core.base import save_circle, download_and_save_telegram_file, \
+    get_main_keyboard, validate_name, \
     is_corporate_email, calc_timedelta_between_dates
 from bot.models.cheque import Cheque
 from bot.models.circle import Circle
 from bot.models.contract import Contract
 from bot.models.report import Report
 from bot.models.user_state import UserState
-from bot.tasks import send_email, send_message_to_user_generic
+from bot.tasks import send_email, send_message_to_user_generic, send_message
 from project.settings import TELEGRAM_API_URL
 from settings.models import Settings
 import requests
 from django.utils import timezone
-
-logger = logging.getLogger(__name__)
 
 
 class TelegramBotHandler:
@@ -205,8 +203,11 @@ class TelegramBotHandler:
             uploaded_at__gte=now_date_minus_day).order_by("uploaded_at")
         if user_today_circles.exists():
             latest_circle_date = user_today_circles.last().uploaded_at
-            wait_timedelta = calc_timedelta_between_dates(now_date_minus_day,
-                                                          latest_circle_date)
+            wait_timedelta = calc_timedelta_between_dates(
+                latest_circle_date, now_date_minus_day)
+            print(f"now_date_minus_day {now_date_minus_day}")
+            print(f"latest_circle_date {latest_circle_date}")
+            print(wait_timedelta)
             send_message("sendMessage", {
                 'chat_id': self.chat_id,
                 'text': f"Вы уже загружали кружок недавно. Подождите {wait_timedelta}"

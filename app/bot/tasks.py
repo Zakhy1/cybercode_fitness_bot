@@ -4,18 +4,25 @@ from celery.app import shared_task
 from django.core.mail import send_mail
 from django.utils.timezone import now
 
-from bot.bot_util import send_message
 from bot.models.cheque import Cheque
-from bot.models.circle import Circle
-from bot.models.contract import Contract
 from bot.models.report import Report
 from bot.models.user_state import UserState
 from project.logging_settings import info_logger, error_logger
-from project.settings import EMAIL_HOST_USER
+from project.settings import EMAIL_HOST_USER, TELEGRAM_API_URL
 from settings.models import Settings
+import requests
 
 info_logger.info("Это информационное сообщение1")
 error_logger.error("Это сообщение об ошибке1")
+
+
+def send_message(method, data):
+    telegram_token = Settings.get_setting("TELEGRAM_TOKEN")
+    url = TELEGRAM_API_URL + telegram_token + '/' + method
+    response = requests.post(url, json=data)
+    return response
+
+
 @shared_task
 def send_email(email, code):
     subject = "Код подтверждения для регистрации"

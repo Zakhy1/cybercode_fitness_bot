@@ -32,7 +32,7 @@ class Report(models.Model):
         for user in users_to_send:
             send_message_to_user_generic({
                 "chat_id": user.chat_id,
-                "text": f"Отчет от {self.start_date.strftime("%d.%m.%Y")} по {self.end_date.strftime("%d.%m.%Y")}"
+                "text": f"Отчет от {self.start_date.strftime('%d.%m.%Y')} по {self.end_date.strftime('%d.%m.%Y')}"
             })
             if send_not_accessed:
                 if len(self.report_data['not_accessed']) > 0:

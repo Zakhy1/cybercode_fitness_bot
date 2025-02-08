@@ -3,16 +3,20 @@ import json
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
+from project.settings import TELEGRAM_API_URL
+from project.logging_settings import error_logger
+
+from settings.models import Settings
+
 from bot.core.base import handle_callback_query
 from bot.core.main import TelegramBotHandler
 from bot.tasks import send_message
-from project.logging_settings import error_logger
-from project.settings import TELEGRAM_API_URL
-from settings.models import Settings
+from bot.util import base_view
 
 import requests
 
 
+@base_view
 @csrf_exempt
 def telegram_bot(request):
     if request.method == 'POST':

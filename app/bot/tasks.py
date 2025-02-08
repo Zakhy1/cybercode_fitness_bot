@@ -1,3 +1,4 @@
+import traceback
 from datetime import timedelta
 
 from celery.app import shared_task
@@ -13,7 +14,6 @@ from settings.models import Settings
 import requests
 
 info_logger.info("Это информационное сообщение1")
-error_logger.error("Это сообщение об ошибке1")
 
 
 def send_message(method, data):
@@ -33,41 +33,50 @@ def send_email(email, code):
         send_mail(subject, message, EMAIL_HOST_USER, recipient_list)
         print(f"Код отправлен на {email}")
     except Exception as e:
-        print(f"Ошибка при отправке email: {e}")
+        error_logger.error(traceback.format_exc())
 
 
 @shared_task
 def send_message_to_user(chat_id, message):
-    send_message("sendMessage", {
-        'chat_id': chat_id,
-        'text': message,
-    })
+    try:
+        send_message("sendMessage", {
+            'chat_id': chat_id,
+            'text': message,
+        })
+    except Exception:
+        error_logger.error(traceback.format_exc())
 
 
 @shared_task
 def send_message_to_user_generic(obj):
-    send_message("sendMessage", obj)
+    try:
+        send_message("sendMessage", obj)
+    except Exception:
+        error_logger.error(traceback.format_exc())
 
 
 @shared_task
 def remind_about_cheque():
-    last_month = now() - timedelta(days=30)
-    users = UserState.objects.filter(is_registered=True)
+    try:
+        last_month = now() - timedelta(days=30)
+        users = UserState.objects.filter(is_registered=True)
 
-    for user in users:
-        last_receipt = Cheque.objects.filter(user=user).order_by(
-            '-uploaded_at').first()
+        for user in users:
+            last_receipt = Cheque.objects.filter(user=user).order_by(
+                '-uploaded_at').first()
 
-        if not last_receipt or last_receipt.uploaded_at < last_month:
-            send_message_to_user.delay(
-                user.chat_id,
-                "Пожалуйста, загрузите новый чек за текущий месяц!"
-            )
+            if not last_receipt or last_receipt.uploaded_at < last_month:
+                send_message_to_user.delay(
+                    user.chat_id,
+                    "Пожалуйста, загрузите новый чек за текущий месяц!"
+                )
+    except Exception:
+        error_logger.error(traceback.format_exc())
 
 
 @shared_task
 def make_report():
-    info_logger.info("Это информационное сообщение1")
-    error_logger.error("Это сообщение об ошибке1")
-
-    Report.create_and_send()
+    try:
+        Report.create_and_send()
+    except Exception:
+        error_logger.error(traceback.format_exc())

@@ -36,15 +36,6 @@ def save_circle(file_id, chat_id):
         f.write(response.content)
 
 
-# def set_bot_commands():
-#     telegram_token = Settings.get_setting("TELEGRAM_TOKEN")
-#     url = TELEGRAM_API_URL + telegram_token + "/setMyCommands"
-#     commands = [
-#         {"command": "add_cheque", "description": "🧾 Добавить чек"},
-#         {"command": "contract", "description": "📄 Добавить договор"},
-#     ]
-#     response = requests.post(url, json={"commands": commands})
-#     return response.json()
 
 
 def download_and_save_telegram_file(file_id, user, model):

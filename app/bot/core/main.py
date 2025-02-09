@@ -168,6 +168,7 @@ class TelegramBotHandler:
         send_message("sendMessage", {
             'chat_id': self.chat_id,
             'text': f"Кружки: {user_circes_count}/{required_count}",
+            'reply_markup': get_main_keyboard(self.user_state)
         })
 
     def handle_document(self, file_id):

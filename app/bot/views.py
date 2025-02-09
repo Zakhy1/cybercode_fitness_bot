@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 
 from project.settings import TELEGRAM_API_URL
-from project.logging_settings import error_logger
+from project.logging_settings import error_logger, info_logger
 
 from settings.models import Settings
 
@@ -80,6 +80,9 @@ def setwebhook(request):
         host_url = Settings.get_setting("HOST_URL") + '/getpost/'
         url = TELEGRAM_API_URL + telegram_token + "/setWebhook?url=" + host_url
         response = requests.post(url).json()
+        info_logger.info(f"Установка токен({telegram_token})")
+        info_logger.info(f"Установка webhook на url ({url})")
+        info_logger.info(f"{response}")
         return HttpResponse(f"{response}")
     except Exception as e:
         return HttpResponse(f"Not set: {str(e)}")

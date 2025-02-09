@@ -22,6 +22,7 @@ def telegram_bot(request):
     if request.method == 'POST':
         try:
             message = json.loads(request.body.decode('utf-8'))
+            info_logger.info(f"Установка токен({message})")
             if "callback_query" in message:
                 return handle_callback_query(message)
 

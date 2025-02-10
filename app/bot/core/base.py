@@ -35,12 +35,13 @@ def save_circle(file_id, chat_id):
 
 
 
+import os
+
 def download_and_save_telegram_file(file_id, user, model):
-    """Скачивает файл с Telegram и сохраняет его в FileField модели, если это PDF."""
+    """Скачивает файл с Telegram и сохраняет его в FileField модели, если это PDF и размер не превышает сколько надо МБ."""
 
     token = Settings.get_setting("TELEGRAM_TOKEN")
 
-    # Получаем путь к файлу на серверах Telegram
     file_info_url = f"{TELEGRAM_API_URL}{token}/getFile?file_id={file_id}"
     response = requests.get(file_info_url).json()
 
@@ -48,20 +49,22 @@ def download_and_save_telegram_file(file_id, user, model):
         return None
 
     file_path = response["result"]["file_path"]
+    file_size = response["result"].get("file_size", 0)
     download_url = f"https://api.telegram.org/file/bot{token}/{file_path}"
 
-    # Получаем имя файла и его расширение
+    max_file_size_setting = int(Settings.get_setting("max_file_size", "20"))
+    max_file_size = max_file_size_setting * 1024 * 1024
+    if file_size > max_file_size:
+        return f"❌ Размер файла превышает {max_file_size}МБ. Пожалуйста, загрузите файл меньшего размера."
+
     filename = file_path.split("/")[-1]
     file_extension = os.path.splitext(filename)[-1].lower()
 
-    # Проверяем, что файл имеет расширение PDF
     if file_extension != '.pdf':
         return "❌ Файл не является PDF. Пожалуйста, загрузите файл с расширением .pdf."
 
-    # Скачиваем файл
     file_data = requests.get(download_url).content
 
-    # Определяем, какую модель использовать (Contract или Receipt)
     if model == "contract":
         contract = Contract(user=user)
         contract.file.save(filename, ContentFile(file_data))  # Сохраняем в FileField

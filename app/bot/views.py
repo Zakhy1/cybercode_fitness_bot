@@ -26,9 +26,10 @@ def telegram_bot(request):
                 return handle_callback_query(message)
 
             handler = TelegramBotHandler(message)
-
             if handler.text == '/start':
                 handler.handle_start()
+            elif handler.user_state.banned:
+                handler.handle_banned()
             elif handler.text == "Регистрация":
                 handler.handle_registration()
             elif handler.user_state.state == 'waiting_for_email':

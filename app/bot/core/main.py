@@ -41,6 +41,12 @@ class TelegramBotHandler:
         self.user_state.state = None
         self.user_state.save()
 
+    def handle_banned(self):
+        send_message("sendMessage", {
+            'chat_id': self.chat_id,
+            'text': "Вы заблокированы!",
+        })
+
     def handle_registration(self):
         send_message("sendMessage", {
             'chat_id': self.chat_id,

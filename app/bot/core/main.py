@@ -12,6 +12,7 @@ from bot.models.contract import Contract
 from bot.models.report import Report
 from bot.models.user_state import UserState
 from bot.tasks import send_email, send_message_to_user_generic, send_message
+from bot.util.timezone_funcs import convert_to_local_time
 from project.settings import TELEGRAM_API_URL
 from settings.models import Settings
 import requests
@@ -81,7 +82,7 @@ class TelegramBotHandler:
 
             send_message("sendMessage", {
                 'chat_id': self.chat_id,
-                'text': "Теперь введите Ваше имя.\nНапример: 'Петров Пётр Петрович' или 'Иван Иванов'",
+                'text': "Теперь введите Ваше ФИО.\nНапример: 'Петров Пётр Петрович' или 'Иван Иванов'",
             })
         else:
             send_message("sendMessage", {
@@ -137,8 +138,9 @@ class TelegramBotHandler:
         latest_cheque = user_cheques.last()
 
         if latest_contract:
+            date_time = convert_to_local_time(latest_contract.uploaded_at)
             inline_keyboard.append([{
-                "text": f"📥 Договор (загружен {latest_contract.uploaded_at.strftime('%d.%m.%Y')})",
+                "text": f"📥 Договор (загружен {date_time.strftime('%d.%m.%Y')})",
                 "url": f'{host_url}{latest_contract.file.url}',
             }])
         else:
@@ -147,9 +149,10 @@ class TelegramBotHandler:
             }])
 
         if latest_cheque:
+            date_time = convert_to_local_time(latest_contract.uploaded_at)
             inline_keyboard.append(
                 [{
-                    "text": f"📥 Последний чек (загружен {latest_contract.uploaded_at.strftime('%d.%m.%Y')})",
+                    "text": f"📥 Последний чек (загружен {date_time.strftime('%d.%m.%Y')})",
                     "url": f'{host_url}{latest_cheque.file.url}',
                 }]
             )
@@ -177,31 +180,54 @@ class TelegramBotHandler:
             'reply_markup': get_main_keyboard(self.user_state)
         })
 
+    def handle_go_back(self):
+        self.user_state.state = ''
+        self.user_state.save()
+        send_message("sendMessage", {
+            'chat_id': self.chat_id,
+            'text': "Загрузка отменена",
+            'reply_markup': get_main_keyboard(self.user_state)
+        })
+
     def handle_document(self, file_id):
         if self.user_state.state == 'waiting_for_contract':
-            download_and_save_telegram_file(file_id, self.user_state,
-                                            "contract")
-            self.user_state.has_contract = True
-            self.user_state.state = None
-            self.user_state.save()
+            result = download_and_save_telegram_file(file_id, self.user_state,
+                                                     "contract")
+            if "❌" in result:
+                send_message("sendMessage", {
+                    'chat_id': self.chat_id,
+                    'text': result,
+                    'reply_markup': get_main_keyboard(self.user_state)
+                })
+            else:
+                self.user_state.has_contract = True
+                self.user_state.state = None
+                self.user_state.save()
 
-            send_message("sendMessage", {
-                'chat_id': self.chat_id,
-                'text': "✅ Договор успешно загружен!",
-                'reply_markup': get_main_keyboard(self.user_state)
-            })
+                send_message("sendMessage", {
+                    'chat_id': self.chat_id,
+                    'text': "✅ Договор успешно загружен!",
+                    'reply_markup': get_main_keyboard(self.user_state)
+                })
 
         elif self.user_state.state == 'waiting_for_receipt':
-            download_and_save_telegram_file(file_id, self.user_state,
-                                            "receipt")
-            self.user_state.state = None
-            self.user_state.save()
+            result = download_and_save_telegram_file(file_id, self.user_state,
+                                                     "receipt")
+            if "❌" in result:
+                send_message("sendMessage", {
+                    'chat_id': self.chat_id,
+                    'text': result,
+                    'reply_markup': get_main_keyboard(self.user_state)
+                })
+            else:
+                self.user_state.state = None
+                self.user_state.save()
 
-            send_message("sendMessage", {
-                'chat_id': self.chat_id,
-                'text': "✅ Чек успешно загружен!",
-                'reply_markup': get_main_keyboard(self.user_state)
-            })
+                send_message("sendMessage", {
+                    'chat_id': self.chat_id,
+                    'text': "✅ Чек успешно загружен!",
+                    'reply_markup': get_main_keyboard(self.user_state)
+                })
 
     def handle_video_note(self, file_id):
         now_date_minus_day = timezone.now() - datetime.timedelta(hours=24)
@@ -212,9 +238,6 @@ class TelegramBotHandler:
             latest_circle_date = user_today_circles.last().uploaded_at
             wait_timedelta = calc_timedelta_between_dates(
                 latest_circle_date, now_date_minus_day)
-            print(f"now_date_minus_day {now_date_minus_day}")
-            print(f"latest_circle_date {latest_circle_date}")
-            print(wait_timedelta)
             send_message("sendMessage", {
                 'chat_id': self.chat_id,
                 'text': f"Вы уже загружали кружок недавно. Подождите {wait_timedelta}"

@@ -49,17 +49,30 @@ def telegram_bot(request):
             elif handler.text in ["Загрузить договор", "Изменить договор"]:
                 send_message("sendMessage", {
                     'chat_id': handler.chat_id,
-                    'text': "Отправьте PDF-файл с договором."
+                    'text': "Отправьте PDF-файл с договором.",
+                    'reply_markup': {
+                        "keyboard": [
+                            [{"text": "🔙 Отмена"}]
+                        ],
+                    }
                 })
                 handler.user_state.state = 'waiting_for_contract'
                 handler.user_state.save()
             elif handler.text.startswith("Загрузить чек"):
                 send_message("sendMessage", {
                     'chat_id': handler.chat_id,
-                    'text': "Отправьте PDF-файл с чеком."
+                    'text': "Отправьте PDF-файл с чеком.",
+                    'reply_markup': {
+                        "keyboard": [
+                            [{"text": "🔙 Отмена"}]
+                        ],
+                    }
                 })
                 handler.user_state.state = 'waiting_for_receipt'
                 handler.user_state.save()
+            elif (
+                    handler.user_state.state == "waiting_for_contract" or handler.user_state.state == "waiting_for_receipt") and handler.text == "🔙 Отмена":
+                handler.handle_go_back()
             elif 'document' in message['message']:
                 file_id = message['message']['document']['file_id']
                 handler.handle_document(file_id)

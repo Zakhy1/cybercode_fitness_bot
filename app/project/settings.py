@@ -1,4 +1,5 @@
 import os
+import zoneinfo
 from pathlib import Path
 
 # import project.logging_settings
@@ -80,7 +81,8 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'ru'
 
-TIME_ZONE = os.environ.get('TZ', 'UTC')
+TIME_ZONE = 'Asia/Krasnoyarsk'
+TIME_ZONE_OBJECT = zoneinfo.ZoneInfo(TIME_ZONE)
 
 USE_I18N = True
 

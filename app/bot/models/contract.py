@@ -17,4 +17,4 @@ class Contract(models.Model):
         verbose_name_plural = "Договоры"
 
     def __str__(self):
-        return f"Чек {self.user.get_name()} от {self.uploaded_at}"
+        return f"Договор {self.user.get_name()} от {self.uploaded_at}"

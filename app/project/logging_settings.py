@@ -41,6 +41,7 @@ def setup_logger(name, level, filename):
         interval=1,
         backupCount=30,  # Хранение ротации логов
         encoding="utf-8",
+        utc=True  # Использовать UTC время для ротации
     )
     handler.setLevel(level)
     handler.setFormatter(logging.Formatter(log_format, date_format))
@@ -51,11 +52,9 @@ def setup_logger(name, level, filename):
     return logger
 
 
-# Создание логгеров с датой в имени
-info_logger = setup_logger("info_logger", logging.INFO,
-                           f"info/info_{current_date}.log")
-error_logger = setup_logger("error_logger", logging.ERROR,
-                            f"error/error_{current_date}.log")
+# Создание логгеров
+info_logger = setup_logger("info_logger", logging.INFO, "info/info.log")
+error_logger = setup_logger("error_logger", logging.ERROR, "error/error.log")
 
 # Удаляем старые логи
 cleanup_old_logs(log_dir, log_retention_days)

@@ -46,7 +46,7 @@ def download_and_save_telegram_file(file_id, user, model):
     response = requests.get(file_info_url).json()
 
     if "result" not in response:
-        return None
+        return "❌ Вы не отправили файл"
 
     file_path = response["result"]["file_path"]
     file_size = response["result"].get("file_size", 0)
@@ -83,7 +83,7 @@ def download_and_save_telegram_file(file_id, user, model):
         circle.save()
         return circle.file.url
 
-    return None
+    return "Неизвестная команда"
 
 
 def get_main_keyboard(user_state):

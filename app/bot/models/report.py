@@ -20,7 +20,7 @@ class Report(models.Model):
     confirmed_by = models.ManyToManyField(UserState, blank=True, verbose_name="Подтвержден")
 
     def __str__(self):
-        return f"Report {self.start_date} - {self.end_date}"
+        return f"Отчет {self.start_date} - {self.end_date}"
 
     class Meta:
         verbose_name = "Отчет"

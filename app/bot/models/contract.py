@@ -15,3 +15,6 @@ class Contract(models.Model):
     class Meta:
         verbose_name = "Договор"
         verbose_name_plural = "Договоры"
+
+    def __str__(self):
+        return f"Чек {self.user.get_name()} от {self.uploaded_at}"

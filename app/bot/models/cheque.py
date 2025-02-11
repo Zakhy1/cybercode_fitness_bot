@@ -14,3 +14,6 @@ class Cheque(models.Model):
     class Meta:
         verbose_name = "Чек"
         verbose_name_plural = "Чеки"
+
+    def __str__(self):
+        return f"Чек {self.user.get_name()} от {self.uploaded_at}"

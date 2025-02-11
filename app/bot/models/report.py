@@ -12,12 +12,22 @@ from settings.models import Settings
 
 
 class Report(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создан")
-    start_date = models.DateField(verbose_name="Дата начала")
-    end_date = models.DateField(verbose_name="Дата конца")
-    report_data = models.JSONField(verbose_name="Содержимое")
-    is_sent = models.BooleanField(default=False, verbose_name="Отправлен")
-    confirmed_by = models.ManyToManyField(UserState, blank=True, verbose_name="Подтвержден")
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Создан")
+    start_date = models.DateField(
+        verbose_name="Дата начала")
+    end_date = models.DateField(
+        verbose_name="Дата конца")
+    report_data = models.JSONField(
+        verbose_name="Содержимое")
+    is_sent = models.BooleanField(
+        default=False,
+        verbose_name="Отправлен")
+    confirmed_by = models.ManyToManyField(
+        UserState,
+        blank=True,
+        verbose_name="Подтвержден")
 
     def __str__(self):
         return f"Отчет {self.start_date} - {self.end_date}"
@@ -36,20 +46,21 @@ class Report(models.Model):
         for user in users_to_send:
             send_message_to_user_generic({
                 "chat_id": user.chat_id,
-                "text": f"Отчет от {self.start_date.strftime('%d.%m.%Y')} по {self.end_date.strftime('%d.%m.%Y')}"
+                "text": f"Отчет от {self.start_date.strftime('%d.%m.%Y')} по "
+                        f"{self.end_date.strftime('%d.%m.%Y')}"
             })
             if send_not_accessed:
                 if len(self.report_data['not_accessed']) > 0:
                     send_message_to_user_generic({
                         "chat_id": user.chat_id,
-                        "text": f"❌ Не подходят под условия компенсации"
+                        "text": "❌ Не подходят под условия компенсации"
                     })
                 for row in self.report_data['not_accessed']:
                     row['chat_id'] = user.chat_id
                     send_message_to_user_generic(row)
                 send_message_to_user_generic({
                     "chat_id": user.chat_id,
-                    "text": f"✅ Подходят под условия компенсации"
+                    "text": "✅ Подходят под условия компенсации"
                 })
             for row in self.report_data['accessed']:
                 row['chat_id'] = user.chat_id
@@ -124,7 +135,9 @@ class Report(models.Model):
             if user_circes_count < required_count:
                 report['not_accessed'].append({
                     "chat_id": "",
-                    "text": f" {user.name} - ❌ (Количество кружков: {user_circes_count}, а необходимо: {required_count})"
+                    "text": f" {user.name} - ❌ "
+                            f"(Количество кружков: {user_circes_count}, "
+                            f"а необходимо: {required_count})"
                 })
                 continue
             try:
@@ -137,7 +150,9 @@ class Report(models.Model):
                 if existent_cheque is not None:
                     report['not_accessed'].append({
                         "chat_id": "",
-                        "text": f"{user.name} - ❌ (Нет чека за месяц: последний от {existent_cheque.uploaded_at})"
+                        "text": f"{user.name} - ❌ "
+                                f"(Нет чека за месяц: последний "
+                                f"от {existent_cheque.uploaded_at})"
                     })
                 else:
                     report['not_accessed'].append({

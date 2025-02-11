@@ -32,7 +32,7 @@ def send_email(email, code):
     try:
         send_mail(subject, message, EMAIL_HOST_USER, recipient_list)
         print(f"Код отправлен на {email}")
-    except Exception as e:
+    except Exception:
         error_logger.error(traceback.format_exc())
 
 

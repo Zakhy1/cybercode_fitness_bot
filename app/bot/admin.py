@@ -8,21 +8,17 @@ from bot.models.circle import Circle
 from bot.models.contract import Contract
 from bot.models.report import Report
 from bot.models.user_state import UserState
-from unfold.forms import AdminPasswordChangeForm, UserChangeForm, UserCreationForm
+
+from unfold.forms import AdminPasswordChangeForm
+from unfold.forms import UserCreationForm
+from unfold.forms import UserChangeForm
+
 from unfold.admin import ModelAdmin
 
 admin.site.unregister(User)
 admin.site.unregister(Group)
-# @admin.register(ModelName)
-# class ModelNameAdmin(admin.ModelAdmin):
-#     list_display = ['']
-#     list_filter = ['']
-#     fields = ['']
-#     inlines = []
-#     raw_id_fields = ['']
-#     readonly_fields = ['']
-#     search_fields = ['']
-#     ordering = ['']
+
+
 @admin.register(User)
 class UserAdmin(BaseUserAdmin, ModelAdmin):
     # Forms loaded from `unfold.forms`
@@ -34,6 +30,7 @@ class UserAdmin(BaseUserAdmin, ModelAdmin):
 @admin.register(Group)
 class GroupAdmin(BaseGroupAdmin, ModelAdmin):
     pass
+
 
 @admin.register(UserState)
 class UserStateAdmin(ModelAdmin):

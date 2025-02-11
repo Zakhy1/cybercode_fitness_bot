@@ -61,7 +61,8 @@ class TelegramBotHandler:
             send_email.delay(self.text, code)  # Отправляем код на почту
             send_message("sendMessage", {
                 'chat_id': self.chat_id,
-                'text': f"Код подтверждения отправлен на {self.text}. Пожалуйста, введите его."
+                'text': f"Код подтверждения отправлен на {self.text}. "
+                        f"Пожалуйста, введите его."
             })
             self.user_state.email = self.text
             self.user_state.confirmation_code = code
@@ -70,7 +71,8 @@ class TelegramBotHandler:
         else:
             send_message("sendMessage", {
                 'chat_id': self.chat_id,
-                'text': "Пожалуйста, введите корректный адрес корпоративной почты."
+                'text': "Пожалуйста, "
+                        "введите корректный адрес корпоративной почты."
             })
 
     def handle_waiting_for_code(self):
@@ -80,7 +82,8 @@ class TelegramBotHandler:
 
             send_message("sendMessage", {
                 'chat_id': self.chat_id,
-                'text': "Теперь введите Ваше ФИО.\nНапример: 'Петров Пётр Петрович' или 'Иван Иванов'",
+                'text': "Теперь введите Ваше ФИО.\n"
+                        "Например: 'Петров Пётр Петрович' или 'Иван Иванов'",
             })
         else:
             send_message("sendMessage", {
@@ -101,7 +104,8 @@ class TelegramBotHandler:
             })
             send_message("sendMessage", {
                 'chat_id': self.chat_id,
-                'text': "Теперь Вам необходимо загрузить договор с спортивной организацией и актуальный чек",
+                'text': "Теперь Вам необходимо загрузить "
+                        "договор с спортивной организацией и актуальный чек",
                 'reply_markup': get_main_keyboard(self.user_state)
             })
         else:
@@ -114,8 +118,8 @@ class TelegramBotHandler:
         today = timezone.now().date()
         first_day_of_current_month = today.replace(day=1)
         first_day_of_previous_month = (
-                first_day_of_current_month - datetime.timedelta(
-            days=1)).replace(day=1)
+                first_day_of_current_month -
+                datetime.timedelta(days=1)).replace(day=1)
         host_url = Settings.get_setting("HOST_URL", "http://localhost:8000")
 
         send_message("sendMessage", {
@@ -138,7 +142,8 @@ class TelegramBotHandler:
         if latest_contract:
             date_time = convert_to_local_time(latest_contract.uploaded_at)
             inline_keyboard.append([{
-                "text": f"📥 Договор (загружен {date_time.strftime('%d.%m.%Y')})",
+                "text": f"📥 Договор "
+                        f"(загружен {date_time.strftime('%d.%m.%Y')})",
                 "url": f'{host_url}{latest_contract.file.url}',
             }])
         else:
@@ -150,7 +155,8 @@ class TelegramBotHandler:
             date_time = convert_to_local_time(latest_contract.uploaded_at)
             inline_keyboard.append(
                 [{
-                    "text": f"📥 Последний чек (загружен {date_time.strftime('%d.%m.%Y')})",
+                    "text": f"📥 Последний чек "
+                            f"(загружен {date_time.strftime('%d.%m.%Y')})",
                     "url": f'{host_url}{latest_cheque.file.url}',
                 }]
             )
@@ -161,7 +167,7 @@ class TelegramBotHandler:
 
         send_message("sendMessage", {
             'chat_id': self.chat_id,
-            'text': f"Документы, необходимые для компенсации",
+            'text': "Документы, необходимые для компенсации",
             "reply_markup": {
                 "inline_keyboard": inline_keyboard
             }
@@ -238,7 +244,8 @@ class TelegramBotHandler:
                 latest_circle_date, now_date_minus_day)
             send_message("sendMessage", {
                 'chat_id': self.chat_id,
-                'text': f"Вы уже загружали кружок недавно. Подождите {wait_timedelta}"
+                'text': f"Вы уже загружали кружок недавно. "
+                        f"Подождите {wait_timedelta}"
             })
         else:
             download_and_save_telegram_file(file_id, self.user_state, "circle")

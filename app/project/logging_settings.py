@@ -3,7 +3,7 @@ import os
 import glob
 import time
 from logging.handlers import TimedRotatingFileHandler
-from datetime import datetime, timedelta
+from datetime import datetime
 
 # Папка для логов
 log_dir = "logs"

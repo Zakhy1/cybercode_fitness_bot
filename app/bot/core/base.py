@@ -23,7 +23,7 @@ def save_circle(file_id, chat_id):
     file_path = \
         requests.get(url, params={'file_id': file_id}).json()['result'][
             'file_path']
-    download_url = f"https://api.telegram.org/file/bot{telegram_token}/{file_path}"
+    download_url = f"{TELEGRAM_API_URL}{telegram_token}/{file_path}"
 
     # Скачивание и сохранение файла
     response = requests.get(download_url)
@@ -33,11 +33,9 @@ def save_circle(file_id, chat_id):
         f.write(response.content)
 
 
-import os
-
-
 def download_and_save_telegram_file(file_id, user, model):
-    """Скачивает файл с Telegram и сохраняет его в FileField модели, если это PDF и размер не превышает сколько надо МБ."""
+    """Скачивает файл с Telegram и сохраняет его в FileField модели,
+    если это PDF или кружок размер не превышает сколько надо МБ."""
 
     token = Settings.get_setting("TELEGRAM_TOKEN")
 
@@ -54,7 +52,8 @@ def download_and_save_telegram_file(file_id, user, model):
     max_file_size_setting = int(Settings.get_setting("max_file_size", "20"))
     max_file_size = max_file_size_setting * 1024 * 1024
     if file_size > max_file_size:
-        return f"❌ Размер файла превышает {max_file_size}МБ. Пожалуйста, загрузите файл меньшего размера."
+        return (f"❌ Размер файла превышает {max_file_size}МБ. "
+                f"Пожалуйста, загрузите файл меньшего размера.")
 
     filename = file_path.split("/")[-1]
     file_extension = os.path.splitext(filename)[-1].lower()
@@ -68,7 +67,8 @@ def download_and_save_telegram_file(file_id, user, model):
         return circle.file.url
 
     if file_extension != '.pdf':
-        return "❌ Файл не является PDF. Пожалуйста, загрузите файл с расширением .pdf."
+        return ("❌ Файл не является PDF. "
+                "Пожалуйста, загрузите файл с расширением .pdf.")
 
     if model == "contract":
         contract = Contract(user=user)
@@ -88,7 +88,10 @@ def download_and_save_telegram_file(file_id, user, model):
 
 def get_main_keyboard(user_state):
     """Генерирует клавиатуру в зависимости от состояния пользователя."""
-    contract_button = "Изменить договор" if user_state.has_contract else "Загрузить договор"
+    if user_state.has_contract:
+        contract_button = "Изменить договор"
+    else:
+        contract_button = "Загрузить договор"
     try:
         latest_cheque = Cheque.objects.filter(user=user_state).latest(
             "uploaded_at")
@@ -108,7 +111,8 @@ def get_main_keyboard(user_state):
 
 
 def validate_name(name):
-    pattern = r'^[А-ЯЁ][а-яё]+(?:-[А-ЯЁ][а-яё]+)? [А-ЯЁ][а-яё]+(?:-[А-ЯЁ][а-яё]+)?(?: [А-ЯЁ][а-яё]+(?:-[А-ЯЁ][а-яё]+)?)?$'
+    pattern = (r'^[А-ЯЁ][а-яё]+(?:-[А-ЯЁ][а-яё]+)? [А-ЯЁ][а-яё]+(?:-[А-ЯЁ]['
+               r'а-яё]+)?(?: [А-ЯЁ][а-яё]+(?:-[А-ЯЁ][а-яё]+)?)?$')
     return bool(re.fullmatch(pattern, name)) and len(name) <= 254
 
 
@@ -128,17 +132,29 @@ def calc_timedelta_between_dates(date_1, date_2) -> str:
     minutes, seconds = divmod(remainder, 60)
 
     if years >= 1:
-        return f"{int(years)} год" if years == 1 else f"{int(years)} года" if 2 <= years <= 4 else f"{int(years)} лет"
+        return f"{int(years)} год" if years == 1 \
+            else f"{int(years)} года" \
+            if 2 <= years <= 4 else f"{int(years)} лет"
     elif months >= 1:
-        return f"{int(months)} месяц" if months == 1 else f"{int(months)} мес." if 2 <= months <= 4 else f"{int(months)} месяцев"
+        return f"{int(months)} месяц" if months == 1 \
+            else f"{int(months)} мес." \
+            if 2 <= months <= 4 else f"{int(months)} месяцев"
     elif days >= 1:
-        return f"{int(days)} день" if days == 1 else f"{int(days)} дн." if 2 <= days <= 4 else f"{int(days)} дней"
+        return f"{int(days)} день" if days == 1 \
+            else f"{int(days)} дн." \
+            if 2 <= days <= 4 else f"{int(days)} дней"
     elif hours >= 1:
-        return f"{int(hours)} ч." if hours == 1 else f"{int(hours)} ч." if 2 <= hours <= 4 else f"{int(hours)} ч."
+        return f"{int(hours)} ч." if hours == 1 \
+            else f"{int(hours)} ч." \
+            if 2 <= hours <= 4 else f"{int(hours)} ч."
     elif minutes >= 1:
-        return f"{int(minutes)} минута" if minutes == 1 else f"{int(minutes)} мин." if 2 <= minutes <= 4 else f"{int(minutes)} минут"
+        return f"{int(minutes)} минута" if minutes == 1 \
+            else f"{int(minutes)} мин." \
+            if 2 <= minutes <= 4 else f"{int(minutes)} минут"
     else:
-        return f"{int(seconds)} секунда" if seconds == 1 else f"{int(seconds)} сек." if 2 <= seconds <= 4 else f"{int(seconds)} секунд"
+        return f"{int(seconds)} секунда" if seconds == 1 \
+            else f"{int(seconds)} сек." \
+            if 2 <= seconds <= 4 else f"{int(seconds)} секунд"
 
 
 def handle_callback_query(message):

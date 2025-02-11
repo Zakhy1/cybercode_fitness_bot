@@ -1,6 +1,9 @@
 import os
 import zoneinfo
 from pathlib import Path
+from django.templatetags.static import static
+
+import project.unfold_config
 
 # import project.logging_settings
 DEBUG = bool(int(os.getenv("DEBUG", True)))
@@ -130,4 +133,5 @@ CELERY_RESULT_SERIALIZER = 'json'
 
 TELEGRAM_API_URL = "https://api.telegram.org/bot"
 
+from project.unfold_config import UNFOLD
 import project.logging_settings

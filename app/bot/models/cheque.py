@@ -8,7 +8,7 @@ def user_directory_path(instance, filename):
 
 class Cheque(models.Model):
     user = models.ForeignKey("UserState", on_delete=models.CASCADE, verbose_name="Пользователь")
-    file = models.FileField(upload_to=user_directory_path, verbose_name="Файл договора")
+    file = models.FileField(upload_to=user_directory_path, verbose_name="Файл чека")
     uploaded_at = models.DateTimeField(auto_now_add=True, verbose_name="Загружен")
 
     class Meta:

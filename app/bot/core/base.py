@@ -33,9 +33,8 @@ def save_circle(file_id, chat_id):
         f.write(response.content)
 
 
-
-
 import os
+
 
 def download_and_save_telegram_file(file_id, user, model):
     """Скачивает файл с Telegram и сохраняет его в FileField модели, если это PDF и размер не превышает сколько надо МБ."""
@@ -60,14 +59,21 @@ def download_and_save_telegram_file(file_id, user, model):
     filename = file_path.split("/")[-1]
     file_extension = os.path.splitext(filename)[-1].lower()
 
+    file_data = requests.get(download_url).content
+
+    if model == "circle":
+        circle = Circle(user=user)
+        circle.file.save(filename, ContentFile(file_data))
+        circle.save()
+        return circle.file.url
+
     if file_extension != '.pdf':
         return "❌ Файл не является PDF. Пожалуйста, загрузите файл с расширением .pdf."
 
-    file_data = requests.get(download_url).content
-
     if model == "contract":
         contract = Contract(user=user)
-        contract.file.save(filename, ContentFile(file_data))  # Сохраняем в FileField
+        contract.file.save(filename,
+                           ContentFile(file_data))  # Сохраняем в FileField
         contract.save()
         return contract.file.url
 
@@ -76,12 +82,6 @@ def download_and_save_telegram_file(file_id, user, model):
         receipt.file.save(filename, ContentFile(file_data))
         receipt.save()
         return receipt.file.url
-
-    elif model == "circle":
-        circle = Circle(user=user)
-        circle.file.save(filename, ContentFile(file_data))
-        circle.save()
-        return circle.file.url
 
     return "Неизвестная команда"
 

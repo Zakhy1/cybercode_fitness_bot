@@ -12,15 +12,19 @@ from settings.models import Settings
 
 
 class Report(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    start_date = models.DateField()
-    end_date = models.DateField()
-    report_data = models.JSONField()
-    is_sent = models.BooleanField(default=False)
-    confirmed_by = models.ManyToManyField(UserState, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Создан")
+    start_date = models.DateField(verbose_name="Дата начала")
+    end_date = models.DateField(verbose_name="Дата конца")
+    report_data = models.JSONField(verbose_name="Содержимое")
+    is_sent = models.BooleanField(default=False, verbose_name="Отправлен")
+    confirmed_by = models.ManyToManyField(UserState, blank=True, verbose_name="Подтвержден")
 
     def __str__(self):
         return f"Report {self.start_date} - {self.end_date}"
+
+    class Meta:
+        verbose_name = "Отчет"
+        verbose_name_plural = "Отчеты"
 
     def send_report(self):
         from bot.tasks import send_message_to_user_generic

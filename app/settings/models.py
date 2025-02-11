@@ -2,10 +2,10 @@ from django.db import models
 
 
 class Settings(models.Model):
-    name = models.CharField(max_length=255, verbose_name="наименование")
-    prefix = models.CharField(max_length=100, verbose_name="префикс",
+    name = models.CharField(max_length=255, verbose_name="Наименование")
+    prefix = models.CharField(max_length=100, verbose_name="Префикс",
                               default="general", null=True, blank=True)
-    value = models.CharField(max_length=255, verbose_name="значение",
+    value = models.CharField(max_length=255, verbose_name="Значение",
                              default="", null=True, blank=True)
 
     @classmethod
@@ -27,5 +27,5 @@ class Settings(models.Model):
         return self.name
 
     class Meta:
-        verbose_name = "настройка"
-        verbose_name_plural = "настройки"
+        verbose_name = "Настройка"
+        verbose_name_plural = "Настройки"

@@ -7,9 +7,13 @@ def user_directory_path(instance, filename):
 
 
 class Circle(models.Model):
-    user = models.ForeignKey("UserState", on_delete=models.CASCADE)
-    file = models.FileField(upload_to=user_directory_path)
-    uploaded_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey("UserState", on_delete=models.CASCADE, verbose_name="Пользователь")
+    file = models.FileField(upload_to=user_directory_path, verbose_name="Файл договора")
+    uploaded_at = models.DateTimeField(auto_now_add=True, verbose_name="Загружен")
 
     def __str__(self):
         return f"Кружок от {self.user.get_name()} {self.uploaded_at}"
+
+    class Meta:
+        verbose_name = "Кружок"
+        verbose_name_plural = "Кружки"

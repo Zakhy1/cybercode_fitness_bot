@@ -5,28 +5,29 @@ from bot.models.circle import Circle
 from bot.models.contract import Contract
 from bot.models.report import Report
 from bot.models.user_state import UserState
+from unfold.admin import ModelAdmin
 
 
 @admin.register(UserState)
-class UserStateAdmin(admin.ModelAdmin):
+class UserStateAdmin(ModelAdmin):
     pass
 
 
 @admin.register(Cheque)
-class ModelNameAdmin(admin.ModelAdmin):
+class ModelNameAdmin(ModelAdmin):
     pass
 
 
 @admin.register(Contract)
-class ContractAdmin(admin.ModelAdmin):
+class ContractAdmin(ModelAdmin):
     pass
 
 
 @admin.register(Circle)
-class CircleAdmin(admin.ModelAdmin):
+class CircleAdmin(ModelAdmin):
     pass
 
 
 @admin.register(Report)
-class ReportAdmin(admin.ModelAdmin):
+class ReportAdmin(ModelAdmin):
     pass

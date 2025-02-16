@@ -30,13 +30,7 @@ class TelegramBotHandler:
         send_message("sendMessage", {
             'chat_id': self.chat_id,
             'text': "Добро пожаловать! Пожалуйста, выберите действие:",
-            'reply_markup': json.dumps({
-                "keyboard": [
-                    [{"text": "Регистрация"}],
-                ],
-                "resize_keyboard": True,
-                "one_time_keyboard": True
-            })
+            'reply_markup': get_main_keyboard(self.user_state)
         })
         self.user_state.state = None
         self.user_state.save()
@@ -170,7 +164,8 @@ class TelegramBotHandler:
             'chat_id': self.chat_id,
             'text': "Документы, необходимые для компенсации",
             "reply_markup": {
-                "inline_keyboard": inline_keyboard
+                "inline_keyboard": inline_keyboard,
+                **get_main_keyboard(self.user_state)
             }
         })
 
@@ -246,18 +241,22 @@ class TelegramBotHandler:
             send_message("sendMessage", {
                 'chat_id': self.chat_id,
                 'text': f"Вы уже загружали кружок недавно. "
-                        f"Подождите {wait_timedelta}"
+                        f"Подождите {wait_timedelta}",
+                'reply_markup': get_main_keyboard(self.user_state)
             })
         else:
             download_and_save_telegram_file(file_id, self.user_state, "circle")
             save_circle(file_id, self.chat_id)
             send_message("sendMessage", {
                 'chat_id': self.chat_id,
-                'text': "Кружок получен и сохранен на сервере."
+                'text': "Кружок получен и сохранен на сервере.",
+                'reply_markup': get_main_keyboard(self.user_state)
+
             })
 
     def handle_unknown_command(self):
         send_message("sendMessage", {
             'chat_id': self.chat_id,
-            'text': "Неизвестная команда."
+            'text': "Неизвестная команда.",
+            'reply_markup': get_main_keyboard(self.user_state)
         })

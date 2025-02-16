@@ -88,6 +88,15 @@ def download_and_save_telegram_file(file_id, user, model):
 
 def get_main_keyboard(user_state):
     """Генерирует клавиатуру в зависимости от состояния пользователя."""
+
+    if not user_state.is_registered:
+        return {
+            "keyboard": [
+                [{"text": "Регистрация"}],
+            ],
+            "resize_keyboard": True,
+            "one_time_keyboard": True
+        }
     if user_state.has_contract:
         contract_button = "Изменить договор"
     else:
@@ -99,7 +108,7 @@ def get_main_keyboard(user_state):
         cheque_button = f"Загрузить чек (Загружен {latest_cheque_date})"
     except Cheque.DoesNotExist:
         cheque_button = "Загрузить чек"
-    return json.dumps({
+    return {
         "keyboard": [
             [{"text": contract_button}],
             [{"text": cheque_button}],
@@ -107,7 +116,7 @@ def get_main_keyboard(user_state):
         ],
         "resize_keyboard": True,
         "one_time_keyboard": True
-    })
+    }
 
 
 def calc_timedelta_between_dates(date_1, date_2) -> str:

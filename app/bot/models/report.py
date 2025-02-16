@@ -123,7 +123,11 @@ class Report(models.Model):
                     "text": f" {user.name} - ❌ (Не зарегистрирован)"
                 })
                 continue
-            if not user.has_contract:
+
+            user_has_contract = Contract.objects.filter(
+                user=user).exists()
+
+            if not user_has_contract:
                 report['not_accessed'].append({
                     "chat_id": "",
                     "text": f" {user.name} - ❌ (Не отправил договор)"

@@ -27,9 +27,6 @@ class UserState(models.Model):
     is_registered = models.BooleanField(
         default=False,
         verbose_name="Зарегистрирован")
-    has_contract = models.BooleanField(
-        default=False,
-        verbose_name="Договор загружен")
     updated_at = models.DateTimeField(
         auto_now=True,
         verbose_name="Дата обновления")

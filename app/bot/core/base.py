@@ -97,10 +97,15 @@ def get_main_keyboard(user_state):
             "resize_keyboard": True,
             "one_time_keyboard": True
         }
-    if user_state.has_contract:
-        contract_button = "Изменить договор"
-    else:
+
+    try:
+        latest_contract = Contract.objects.filter(user=user_state).latest(
+            "uploaded_at")
+        latest_contract_date = latest_contract.uploaded_at.strftime("%d.%m.%Y")
+        contract_button = f"Загрузить договор (Загружен {latest_contract_date})"
+    except Contract.DoesNotExist:
         contract_button = "Загрузить договор"
+
     try:
         latest_cheque = Cheque.objects.filter(user=user_state).latest(
             "uploaded_at")

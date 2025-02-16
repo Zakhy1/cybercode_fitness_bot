@@ -200,7 +200,6 @@ class TelegramBotHandler:
                     'reply_markup': get_main_keyboard(self.user_state)
                 })
             else:
-                self.user_state.has_contract = True
                 self.user_state.state = None
                 self.user_state.save()
 

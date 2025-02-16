@@ -13,7 +13,7 @@ from project.settings import EMAIL_HOST_USER, TELEGRAM_API_URL
 from settings.models import Settings
 import requests
 
-info_logger.info("Это информационное сообщение1")
+# info_logger.info("Это информационное сообщение1")
 
 
 def send_message(method, data):

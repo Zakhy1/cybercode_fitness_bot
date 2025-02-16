@@ -24,8 +24,7 @@ class TelegramBotWebhookView(CSRFExemptMixin, View):
                 dispatcher.dispatch(message)
             except Exception as e:
                 error_logger.error(
-                    f"Ошибка во время обработки сообщения: {e}\n\n "
-                    f"Сообщение: {message}\n")
+                    f"Ошибка во время обработки сообщения: {e}\nСообщение: {message}\n")
                 return HttpResponse('error', status=500)
 
         return HttpResponse('ok')

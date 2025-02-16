@@ -5,8 +5,7 @@ import random
 from django.utils import timezone
 
 from bot.core.base import save_circle, download_and_save_telegram_file, \
-    get_main_keyboard, validate_name, \
-    is_corporate_email, calc_timedelta_between_dates
+    get_main_keyboard, calc_timedelta_between_dates
 
 from bot.models.cheque import Cheque
 from bot.models.circle import Circle
@@ -14,6 +13,8 @@ from bot.models.contract import Contract
 from bot.models.user_state import UserState
 from bot.tasks import send_email, send_message
 from bot.util.timezone_funcs import convert_to_local_time
+from bot.validators.is_corporate_email import is_corporate_email
+from bot.validators.validate_name import validate_name
 from settings.models import Settings
 
 

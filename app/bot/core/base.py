@@ -110,17 +110,6 @@ def get_main_keyboard(user_state):
     })
 
 
-def validate_name(name):
-    pattern = (r'^[А-ЯЁ][а-яё]+(?:-[А-ЯЁ][а-яё]+)? [А-ЯЁ][а-яё]+(?:-[А-ЯЁ]['
-               r'а-яё]+)?(?: [А-ЯЁ][а-яё]+(?:-[А-ЯЁ][а-яё]+)?)?$')
-    return bool(re.fullmatch(pattern, name)) and len(name) <= 254
-
-
-def is_corporate_email(email):
-    pattern = r'^[a-zA-Z0-9._%+-]+@cybercode\.pro$'
-    return bool(re.fullmatch(pattern, email))
-
-
 def calc_timedelta_between_dates(date_1, date_2) -> str:
     delta = date_1 - date_2
 

@@ -157,9 +157,9 @@ class TelegramBotHandler:
                 }]
             )
         else:
-            inline_keyboard.append({
+            inline_keyboard.append([{
                 "text": "Загрузить чек",
-            })
+            }])
 
         send_message("sendMessage", {
             'chat_id': self.chat_id,

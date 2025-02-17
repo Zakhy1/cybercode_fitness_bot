@@ -169,7 +169,6 @@ class TelegramBotHandler:
             'text': "Документы, необходимые для компенсации",
             "reply_markup": {
                 "inline_keyboard": inline_keyboard,
-                **get_main_keyboard(self.user_state)
             }
         })
 

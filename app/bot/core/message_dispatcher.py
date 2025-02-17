@@ -1,4 +1,3 @@
-from bot.core.base import handle_callback_query
 from bot.core.message_handler import TelegramBotHandler
 from bot.tasks import send_message
 from project.logging_settings import info_logger
@@ -6,10 +5,11 @@ from project.logging_settings import info_logger
 
 class TelegramBotDispatcher:
     def dispatch(self, message):
-        if "callback_query" in message:
-            return handle_callback_query(message)
-
         handler = TelegramBotHandler(message)
+
+        if "callback_query" in message:
+            return handler.handle_callback_query(message)
+
         if handler.text == '/start':
             info_logger.info(f"Обработка /start\n{message}\n")
             handler.handle_start()

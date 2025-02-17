@@ -2,6 +2,7 @@ import datetime
 import json
 import random
 
+from django.http import HttpResponse
 from django.utils import timezone
 
 from bot.core.base import save_circle, download_and_save_telegram_file, \
@@ -10,8 +11,9 @@ from bot.core.base import save_circle, download_and_save_telegram_file, \
 from bot.models.cheque import Cheque
 from bot.models.circle import Circle
 from bot.models.contract import Contract
+from bot.models.report import Report
 from bot.models.user_state import UserState
-from bot.tasks import send_email, send_message
+from bot.tasks import send_email, send_message, send_message_to_user_generic
 from bot.util.timezone_funcs import convert_to_local_time
 from bot.validators.is_corporate_email import is_corporate_email
 from bot.validators.validate_name import validate_name
@@ -144,6 +146,7 @@ class TelegramBotHandler:
         else:
             inline_keyboard.append([{
                 "text": "Загрузить договор",
+                "callback_data": "upload_contract"
             }])
 
         if latest_cheque:
@@ -158,6 +161,7 @@ class TelegramBotHandler:
         else:
             inline_keyboard.append([{
                 "text": "Загрузить чек",
+                "callback_data": "upload_cheque"
             }])
 
         send_message("sendMessage", {
@@ -252,6 +256,48 @@ class TelegramBotHandler:
                 'reply_markup': get_main_keyboard(self.user_state)
 
             })
+
+    def handle_callback_query(self, message):
+        callback_data = message["callback_query"]["data"]
+        chat_id = message["callback_query"]["message"]["chat"]["id"]
+        user = UserState.objects.get(chat_id=chat_id)
+
+        if callback_data.startswith("success_report_"):
+            obj_id = int(callback_data.replace("success_report_", ""))
+            obj = Report.objects.filter(id=obj_id).first()
+            obj.confirmed_by.add(user)
+            obj.save()
+            send_message_to_user_generic({
+                "chat_id": user.chat_id,
+                "text": "✅ Вы успешно подтвердили получение отчета."
+            })
+
+        if callback_data == "upload_contract":
+            self.user_state.state = "waiting_for_contract"
+            self.user_state.save()
+            send_message("sendMessage", {
+                'chat_id': self.chat_id,
+                'text': "Отправьте PDF-файл с договором.",
+                'reply_markup': {
+                    "keyboard": [
+                        [{"text": "🔙 Отмена"}]
+                    ],
+                }
+            })
+        elif callback_data == "upload_cheque":
+            self.user_state.state = "waiting_for_receipt"
+            self.user_state.save()
+            send_message("sendMessage", {
+                'chat_id': self.chat_id,
+                'text': "Отправьте PDF-файл с чеком.",
+                'reply_markup': {
+                    "keyboard": [
+                        [{"text": "🔙 Отмена"}]
+                    ],
+                }
+            })
+
+        return HttpResponse('ok')
 
     def handle_unknown_command(self):
         send_message("sendMessage", {

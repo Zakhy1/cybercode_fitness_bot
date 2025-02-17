@@ -158,21 +158,3 @@ def calc_timedelta_between_dates(date_1, date_2) -> str:
         return f"{int(seconds)} секунда" if seconds == 1 \
             else f"{int(seconds)} сек." \
             if 2 <= seconds <= 4 else f"{int(seconds)} секунд"
-
-
-def handle_callback_query(message):
-    callback_data = message["callback_query"]["data"]
-    chat_id = message["callback_query"]["message"]["chat"]["id"]
-    user = UserState.objects.get(chat_id=chat_id)
-
-    if callback_data.startswith("success_report_"):
-        obj_id = int(callback_data.replace("success_report_", ""))
-        obj = Report.objects.filter(id=obj_id).first()
-        obj.confirmed_by.add(user)
-        obj.save()
-        send_message_to_user_generic({
-            "chat_id": user.chat_id,
-            "text": "✅ Вы успешно подтвердили получение отчета."
-        })
-
-    return HttpResponse('ok')

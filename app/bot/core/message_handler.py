@@ -1,22 +1,21 @@
 import datetime
 import json
 import random
-import logging
+
+from django.utils import timezone
 
 from bot.core.base import save_circle, download_and_save_telegram_file, \
-    get_main_keyboard, validate_name, \
-    is_corporate_email, calc_timedelta_between_dates
+    get_main_keyboard, calc_timedelta_between_dates
+
 from bot.models.cheque import Cheque
 from bot.models.circle import Circle
 from bot.models.contract import Contract
-from bot.models.report import Report
 from bot.models.user_state import UserState
-from bot.tasks import send_email, send_message_to_user_generic, send_message
+from bot.tasks import send_email, send_message
 from bot.util.timezone_funcs import convert_to_local_time
-from project.settings import TELEGRAM_API_URL
+from bot.validators.is_corporate_email import is_corporate_email
+from bot.validators.validate_name import validate_name
 from settings.models import Settings
-import requests
-from django.utils import timezone
 
 
 class TelegramBotHandler:
@@ -31,13 +30,7 @@ class TelegramBotHandler:
         send_message("sendMessage", {
             'chat_id': self.chat_id,
             'text': "Добро пожаловать! Пожалуйста, выберите действие:",
-            'reply_markup': json.dumps({
-                "keyboard": [
-                    [{"text": "Регистрация"}],
-                ],
-                "resize_keyboard": True,
-                "one_time_keyboard": True
-            })
+            'reply_markup': get_main_keyboard(self.user_state)
         })
         self.user_state.state = None
         self.user_state.save()
@@ -63,7 +56,8 @@ class TelegramBotHandler:
             send_email.delay(self.text, code)  # Отправляем код на почту
             send_message("sendMessage", {
                 'chat_id': self.chat_id,
-                'text': f"Код подтверждения отправлен на {self.text}. Пожалуйста, введите его."
+                'text': f"Код подтверждения отправлен на {self.text}. "
+                        f"Пожалуйста, введите его."
             })
             self.user_state.email = self.text
             self.user_state.confirmation_code = code
@@ -72,7 +66,8 @@ class TelegramBotHandler:
         else:
             send_message("sendMessage", {
                 'chat_id': self.chat_id,
-                'text': "Пожалуйста, введите корректный адрес корпоративной почты."
+                'text': "Пожалуйста, "
+                        "введите корректный адрес корпоративной почты."
             })
 
     def handle_waiting_for_code(self):
@@ -82,7 +77,8 @@ class TelegramBotHandler:
 
             send_message("sendMessage", {
                 'chat_id': self.chat_id,
-                'text': "Теперь введите Ваше ФИО.\nНапример: 'Петров Пётр Петрович' или 'Иван Иванов'",
+                'text': "Теперь введите Ваше ФИО.\n"
+                        "Например: 'Петров Пётр Петрович' или 'Иван Иванов'",
             })
         else:
             send_message("sendMessage", {
@@ -103,7 +99,8 @@ class TelegramBotHandler:
             })
             send_message("sendMessage", {
                 'chat_id': self.chat_id,
-                'text': "Теперь Вам необходимо загрузить договор с спортивной организацией и актуальный чек",
+                'text': "Теперь Вам необходимо загрузить "
+                        "договор с спортивной организацией и актуальный чек",
                 'reply_markup': get_main_keyboard(self.user_state)
             })
         else:
@@ -116,8 +113,8 @@ class TelegramBotHandler:
         today = timezone.now().date()
         first_day_of_current_month = today.replace(day=1)
         first_day_of_previous_month = (
-                first_day_of_current_month - datetime.timedelta(
-            days=1)).replace(day=1)
+                first_day_of_current_month -
+                datetime.timedelta(days=1)).replace(day=1)
         host_url = Settings.get_setting("HOST_URL", "http://localhost:8000")
 
         send_message("sendMessage", {
@@ -140,7 +137,8 @@ class TelegramBotHandler:
         if latest_contract:
             date_time = convert_to_local_time(latest_contract.uploaded_at)
             inline_keyboard.append([{
-                "text": f"📥 Договор (загружен {date_time.strftime('%d.%m.%Y')})",
+                "text": f"📥 Договор "
+                        f"(загружен {date_time.strftime('%d.%m.%Y')})",
                 "url": f'{host_url}{latest_contract.file.url}',
             }])
         else:
@@ -152,7 +150,8 @@ class TelegramBotHandler:
             date_time = convert_to_local_time(latest_contract.uploaded_at)
             inline_keyboard.append(
                 [{
-                    "text": f"📥 Последний чек (загружен {date_time.strftime('%d.%m.%Y')})",
+                    "text": f"📥 Последний чек "
+                            f"(загружен {date_time.strftime('%d.%m.%Y')})",
                     "url": f'{host_url}{latest_cheque.file.url}',
                 }]
             )
@@ -163,9 +162,10 @@ class TelegramBotHandler:
 
         send_message("sendMessage", {
             'chat_id': self.chat_id,
-            'text': f"Документы, необходимые для компенсации",
+            'text': "Документы, необходимые для компенсации",
             "reply_markup": {
-                "inline_keyboard": inline_keyboard
+                "inline_keyboard": inline_keyboard,
+                **get_main_keyboard(self.user_state)
             }
         })
 
@@ -200,7 +200,6 @@ class TelegramBotHandler:
                     'reply_markup': get_main_keyboard(self.user_state)
                 })
             else:
-                self.user_state.has_contract = True
                 self.user_state.state = None
                 self.user_state.save()
 
@@ -240,18 +239,23 @@ class TelegramBotHandler:
                 latest_circle_date, now_date_minus_day)
             send_message("sendMessage", {
                 'chat_id': self.chat_id,
-                'text': f"Вы уже загружали кружок недавно. Подождите {wait_timedelta}"
+                'text': f"Вы уже загружали кружок недавно. "
+                        f"Подождите {wait_timedelta}",
+                'reply_markup': get_main_keyboard(self.user_state)
             })
         else:
             download_and_save_telegram_file(file_id, self.user_state, "circle")
             save_circle(file_id, self.chat_id)
             send_message("sendMessage", {
                 'chat_id': self.chat_id,
-                'text': "Кружок получен и сохранен на сервере."
+                'text': "Кружок получен и сохранен на сервере.",
+                'reply_markup': get_main_keyboard(self.user_state)
+
             })
 
     def handle_unknown_command(self):
         send_message("sendMessage", {
             'chat_id': self.chat_id,
-            'text': "Неизвестная команда."
+            'text': "Неизвестная команда.",
+            'reply_markup': get_main_keyboard(self.user_state)
         })

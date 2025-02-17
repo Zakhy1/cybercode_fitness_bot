@@ -13,7 +13,7 @@ from project.settings import EMAIL_HOST_USER, TELEGRAM_API_URL
 from settings.models import Settings
 import requests
 
-info_logger.info("Это информационное сообщение1")
+# info_logger.info("Это информационное сообщение1")
 
 
 def send_message(method, data):
@@ -32,7 +32,7 @@ def send_email(email, code):
     try:
         send_mail(subject, message, EMAIL_HOST_USER, recipient_list)
         print(f"Код отправлен на {email}")
-    except Exception as e:
+    except Exception:
         error_logger.error(traceback.format_exc())
 
 

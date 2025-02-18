@@ -10,5 +10,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL("ALTER TABLE bot_userstate DROP COLUMN boolean;"),
+        migrations.RunSQL("ALTER TABLE bot_userstate DROP COLUMN has_contract;"),
     ]

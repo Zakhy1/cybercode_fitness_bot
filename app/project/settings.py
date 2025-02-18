@@ -32,6 +32,7 @@ INSTALLED_APPS = [
 
     'settings.apps.SettingsConfig',
     'bot.apps.BotConfig',
+    'report.apps.ReportConfig',
 ]
 
 MIDDLEWARE = [

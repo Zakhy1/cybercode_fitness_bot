@@ -6,7 +6,6 @@ from django.contrib.auth.admin import GroupAdmin as BaseGroupAdmin
 from bot.models.cheque import Cheque
 from bot.models.circle import Circle
 from bot.models.contract import Contract
-from bot.models.report import Report
 from bot.models.user_state import UserState
 
 from unfold.forms import AdminPasswordChangeForm
@@ -49,9 +48,4 @@ class ContractAdmin(ModelAdmin):
 
 @admin.register(Circle)
 class CircleAdmin(ModelAdmin):
-    pass
-
-
-@admin.register(Report)
-class ReportAdmin(ModelAdmin):
     pass

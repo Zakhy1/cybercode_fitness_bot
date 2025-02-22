@@ -1,3 +1,12 @@
-from django.shortcuts import render
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import FormView
 
-# Create your views here.
+from report.forms.form_report import ReportForm
+
+
+class ReportView(LoginRequiredMixin, FormView):
+    template_name = 'report/report.html'
+    form_class = ReportForm
+
+    def form_valid(self, form):
+        return ...

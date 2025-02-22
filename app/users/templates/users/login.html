@@ -1,53 +1,60 @@
+{% extends 'base.html' %}
 {% load static %}
-<!doctype html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link type="image/x-icon" href="{% static 'report/img/diagram.png' %}" rel="shortcut icon">
-    <link type="Image/x-icon" href="{% static 'report/img/diagram.png' %}" rel="icon">
-    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+{% block title %}Логин{% endblock title %}
+{% block add_css %}
     <link rel="stylesheet" href="{% static 'users/login.css' %}">
-    <title>Авторизация</title>
-</head>
-<body>
-<div class="container">
-    <div class="row d-flex justify-content-center mt-5">
-        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
-            <div class="card py-3 px-2">
-                <p class="text-center mb-3 mt-2">
-                <h3 class="d-flex justify-content-center">АВТОРИЗАЦИЯ</h3></p>
-                <form class="myform" method="post">
-                    {% if form.errors %}
-                        {% for field in form %}
-                            {% for error in field.errors %}
-                                <div class="alert alert-danger alert-dismissible">
-                                    <h5><i class="icon fas fa-ban"></i>Ошибка ввода</h5>
-                                    {{ field.label }}: {{ error }}
-                                </div>
-                            {% endfor %}
-                        {% endfor %}
-                    {% endif %}
-                    {% csrf_token %}
-                    <div class="form-group">
-                        <input type="text" name="username" class="form-control" placeholder="Логин" id="id_username"
-                               autocomplete="username" autofocus required>
-                    </div>
-                    <div class="form-group">
-                        <input type="password" name="password" class="form-control" placeholder="Введите пароль" id="id_password"
-                               required autocomplete="current-password">
-                    </div>
-                    <div class="form-group mt-3">
-                        <button type="submit" class="btn btn-block btn-primary btn-lg"><small><i
-                                class="far fa-user pr-2"></i>Войти</small></button>
-                    </div>
-                </form>
-            </div>
-        </div>
+{% endblock %}
+{% block content %}
+<div class="login-card">
+    <!-- Логотип -->
+    <div class="text-center mb-4">
+        <img src="{% static 'img/cybercode.png' %}" alt="Логотип компании" class="logo-img">
     </div>
+    <h2 class="text-center">Добро пожаловать</h2>
+
+<!-- Вывод ошибок -->
+{% if form.errors %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fa-regular fa-triangle-exclamation"></i> <!-- Иконка ошибки -->
+        <strong>Ошибка!</strong> Проверьте правильность введенных данных.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Закрыть"></button>
+    </div>
+{% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- Поле "Имя пользователя" -->
+        <div class="mb-3">
+            <label for="username" class="form-label">Логин</label>
+            <input type="text" class="form-control" id="username" name="username" required placeholder="Имя пользователя">
+            {% if form.username.errors %}
+                <div class="invalid-feedback">
+                    {{ form.username.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Поле "Пароль" -->
+        <div class="mb-3">
+            <label for="password" class="form-label">Пароль</label>
+            <input type="password" class="form-control" id="password" name="password" required placeholder="Введите пароль">
+            {% if form.password.errors %}
+                <div class="invalid-feedback">
+                    {{ form.password.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Кнопка входа -->
+    <div class="d-flex w-100">
+        <button type="submit" class="btn btn-primary w-100">Войти</button>
 </div>
-<script src="{% static 'bootstrap/bootstrap.bundle.min.js' %}"></script>
-</body>
-</html>
+        <!-- Описание системы -->
+        <div class="footer-links mt-4">
+            <p>Обсидиан: 1.0.0.0</p>
+            <p>Разработано <a href="https://cybercode.pro" target="_blank" rel="noopener noreferrer">КиберКод</a> &copy; 2023 - 2025</p>
+        </div>
+    </form>
+</div>
+{% endblock content %}

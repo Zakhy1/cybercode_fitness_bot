@@ -21,16 +21,38 @@
 <div class="container">
     <div class="row">
         <div class="col-12">
-            <form method="post">
-                <div class="d-flex">
-                    {{ form.date_start.label }}
-                    {{ form.date_start }}
-                    -
-                    {{ form.date_end }}
-                    {% csrf_token %}
+            <div class="card mt-3">
+                <h5 class="card-header">Отчет</h5>
+                <div class="card-body">
+                    <form method="post">
+                        {% if form.errors %}
+                            {% for error in form.non_field_errors %}
+                                <div class="alert alert-danger alert-dismissible">
+                                    <h5><i class="icon fas fa-ban"></i>Ошибка ввода</h5>
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="mb-3">
+                            <div class="mb-2">
+                                <label for="{{ form.date_start.id_for_label }}" style="user-select: none">
+                                    {{ form.date_start.label }}:
+                                </label>
+                                {{ form.date_start }}
+                            </div>
+                            <div class="mb-2">
+                                <label for="{{ form.date_end.id_for_label }}" style="user-select: none">
+                                    {{ form.date_end.label }}:
+                                </label>
+                                {{ form.date_end }}
+                            </div>
+                        </div>
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">Сформировать отчет</button>
+                    </form>
                 </div>
-                <button type="submit">Отчет</button>
-            </form>
+            </div>
+
         </div>
     </div>
 </div>

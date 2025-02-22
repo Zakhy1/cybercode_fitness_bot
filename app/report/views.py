@@ -7,6 +7,7 @@ from report.forms.form_report import ReportForm
 class ReportView(LoginRequiredMixin, FormView):
     template_name = 'report/report.html'
     form_class = ReportForm
+    success_url = '/'
 
     def form_valid(self, form):
-        return ...
+        return super().form_valid(form)

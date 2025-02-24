@@ -14,6 +14,12 @@
 
     <link rel="stylesheet" href="{% static 'flatpickr/flatpickr.min.css' %}">
     <link rel="stylesheet" href="{% static 'flatpickr/theme.css' %}">
+
+    <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'fontawesomefree/css/fontawesome.min.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
+
     <title>Отчет</title>
 </head>
 <body>
@@ -52,13 +58,55 @@
                     </form>
                 </div>
             </div>
-
         </div>
+        {% if report_data %}
+            <div class="col-12">
+                <div class="card mt-3">
+                    <h5 class="card-header" style="position: sticky; top: 0; background-color: #fff;">
+                        <data value="{{ date_start }}">{{ date_start }}</data>
+                        -
+                        <data value="{{ date_end }}">{{ date_end }}</data>
+                    </h5>
+                    <div class="card-body p-0">
+                        <h4 class="mb-3 p-3"
+                            style="position: sticky; top: 35px; z-index: 9; background-color: #e0e0e0"><i
+                                class="fa-solid fa-check"
+                                style="margin-right: 10px; color: var(--bs-success);"></i>
+                            Подходят под условия компенсации</h4>
+                        <div class="p-3">
+                            {% for accessed in report_data.accessed %}
+                                <h5>{{ accessed.name }}</h5>
+                                <p><b>Количество посещений: </b> {{ accessed.visits_count }}/{{ required_count }}</p>
+                                <a href="{{ accessed.contract }}" class="btn btn-outline-primary">Договор</a>
+                                <a href="{{ accessed.cheque }}" class="btn btn-outline-primary">Чек</a>
+                                <hr>
+
+                            {% endfor %}
+                        </div>
+                        <h4 class="mb-3 p-3"
+                            style="position: sticky; top: 35px; z-index: 10; background-color: #e0e0e0"><i
+                                class="fa-solid fa-close"
+                                style="margin-right: 10px; color: var(--bs-danger)"></i>
+                            Не подходят под условия компенсации</h4>
+                        <div class="p-3">
+                            {% for not_accessed in report_data.not_accessed %}
+                                <h5>{{ not_accessed.name }}</h5>
+                                <p><b>Причина: </b>{{ not_accessed.reason }}</p>
+                                <hr>
+
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
     </div>
 </div>
 
 <script src="{% static 'bootstrap/bootstrap.bundle.min.js' %}"></script>
 <script src="{% static 'flatpickr/flatpickr.min.js' %}"></script>
+<script src="{% static 'fontawesomefree/js/fontawesome.js' %}"></script>
+<script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
 <script>
     const fp = flatpickr(".date-picker", {

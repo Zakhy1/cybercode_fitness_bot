@@ -84,7 +84,7 @@ class ReportView(LoginRequiredMixin, FormView):
                         "name": user.get_name(),
                         "reason":
                             f"Нет чека за месяц: последний чек"
-                            f"от {existent_cheque.uploaded_at.strftime("%d.%m.%Y")})"
+                            f"от {existent_cheque.uploaded_at.strftime('%d.%m.%Y')})"
                     })
                 else:
                     report['not_accessed'].append({

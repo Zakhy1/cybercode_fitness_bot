@@ -113,9 +113,6 @@ class TelegramBotHandler:
     def handle_status(self):
         today = timezone.now().date()
         first_day_of_current_month = today.replace(day=1)
-        first_day_of_previous_month = (
-                first_day_of_current_month -
-                datetime.timedelta(days=1)).replace(day=1)
         host_url = Settings.get_setting("HOST_URL", "http://localhost:8000")
 
         send_message("sendMessage", {
@@ -174,7 +171,7 @@ class TelegramBotHandler:
         required_count = int(
             Settings.get_setting("circle_required_count", "4"))
         user_circes_count = Circle.objects.filter(
-            uploaded_at__gte=first_day_of_previous_month,
+            uploaded_at__gte=first_day_of_current_month,
             user=self.user_state).count()
         send_message("sendMessage", {
             'chat_id': self.chat_id,

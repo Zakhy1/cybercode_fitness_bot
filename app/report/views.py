@@ -64,6 +64,7 @@ class ReportView(LoginRequiredMixin, FormView):
                 continue
             user_circles_count = Circle.objects.filter(
                 uploaded_at__gte=start_date,
+                uploaded_at__lte=end_date,
                 user=user).count()
             if user_circles_count < required_count:
                 report['not_accessed'].append({

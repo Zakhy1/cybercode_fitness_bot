@@ -6,7 +6,6 @@ from django.core.mail import send_mail
 from django.utils.timezone import now
 
 from bot.models.cheque import Cheque
-from bot.models.report import Report
 from bot.models.user_state import UserState
 from project.logging_settings import info_logger, error_logger
 from project.settings import EMAIL_HOST_USER, TELEGRAM_API_URL
@@ -70,13 +69,5 @@ def remind_about_cheque():
                     user.chat_id,
                     "Пожалуйста, загрузите новый чек за текущий месяц!"
                 )
-    except Exception:
-        error_logger.error(traceback.format_exc())
-
-
-@shared_task
-def make_report():
-    try:
-        Report.create_and_send()
     except Exception:
         error_logger.error(traceback.format_exc())

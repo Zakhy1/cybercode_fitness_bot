@@ -1,7 +1,6 @@
 import json
 
 from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import View
 
 from bot.core.message_dispatcher import TelegramBotDispatcher

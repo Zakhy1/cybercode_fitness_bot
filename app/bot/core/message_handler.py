@@ -11,7 +11,6 @@ from bot.core.base import save_circle, download_and_save_telegram_file, \
 from bot.models.cheque import Cheque
 from bot.models.circle import Circle
 from bot.models.contract import Contract
-from bot.models.report import Report
 from bot.models.user_state import UserState
 from bot.tasks import send_email, send_message, send_message_to_user_generic
 from bot.util.timezone_funcs import convert_to_local_time
@@ -114,9 +113,6 @@ class TelegramBotHandler:
     def handle_status(self):
         today = timezone.now().date()
         first_day_of_current_month = today.replace(day=1)
-        first_day_of_previous_month = (
-                first_day_of_current_month -
-                datetime.timedelta(days=1)).replace(day=1)
         host_url = Settings.get_setting("HOST_URL", "http://localhost:8000")
 
         send_message("sendMessage", {
@@ -175,7 +171,7 @@ class TelegramBotHandler:
         required_count = int(
             Settings.get_setting("circle_required_count", "4"))
         user_circes_count = Circle.objects.filter(
-            uploaded_at__gte=first_day_of_previous_month,
+            uploaded_at__gte=first_day_of_current_month,
             user=self.user_state).count()
         send_message("sendMessage", {
             'chat_id': self.chat_id,
@@ -258,18 +254,6 @@ class TelegramBotHandler:
 
     def handle_callback_query(self, message):
         callback_data = message["callback_query"]["data"]
-        chat_id = message["callback_query"]["message"]["chat"]["id"]
-        user = UserState.objects.get(chat_id=chat_id)
-
-        if callback_data.startswith("success_report_"):
-            obj_id = int(callback_data.replace("success_report_", ""))
-            obj = Report.objects.filter(id=obj_id).first()
-            obj.confirmed_by.add(user)
-            obj.save()
-            send_message_to_user_generic({
-                "chat_id": user.chat_id,
-                "text": "✅ Вы успешно подтвердили получение отчета."
-            })
 
         if callback_data == "upload_contract":
             self.user_state.state = "waiting_for_contract"

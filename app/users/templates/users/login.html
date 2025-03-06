@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Логин{% endblock title %}
+{% block add_css %}
+    <link rel="stylesheet" href="{% static 'users/login.css' %}">
+{% endblock %}
+{% block content %}
+<div class="login-card">
+    <!-- Логотип -->
+    <div class="text-center mb-4">
+        <img src="{% static 'img/cybercode.png' %}" alt="Логотип компании" class="logo-img">
+    </div>
+    <h2 class="text-center">Добро пожаловать</h2>
+
+<!-- Вывод ошибок -->
+{% if form.errors %}
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fa-regular fa-triangle-exclamation"></i> <!-- Иконка ошибки -->
+        <strong>Ошибка!</strong> Проверьте правильность введенных данных.
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Закрыть"></button>
+    </div>
+{% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- Поле "Имя пользователя" -->
+        <div class="mb-3">
+            <label for="username" class="form-label">Логин</label>
+            <input type="text" class="form-control" id="username" name="username" required placeholder="Имя пользователя">
+            {% if form.username.errors %}
+                <div class="invalid-feedback">
+                    {{ form.username.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Поле "Пароль" -->
+        <div class="mb-3">
+            <label for="password" class="form-label">Пароль</label>
+            <input type="password" class="form-control" id="password" name="password" required placeholder="Введите пароль">
+            {% if form.password.errors %}
+                <div class="invalid-feedback">
+                    {{ form.password.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Кнопка входа -->
+    <div class="d-flex w-100">
+        <button type="submit" class="btn btn-primary w-100">Войти</button>
+</div>
+        <!-- Описание системы -->
+        <div class="footer-links mt-4">
+            <p>Обсидиан: 1.0.0.0</p>
+            <p>Разработано <a href="https://cybercode.pro" target="_blank" rel="noopener noreferrer">КиберКод</a> &copy; 2023 - 2025</p>
+        </div>
+    </form>
+</div>
+{% endblock content %}

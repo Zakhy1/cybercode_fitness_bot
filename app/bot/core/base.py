@@ -10,7 +10,6 @@ from django.http import HttpResponse
 from bot.models.cheque import Cheque
 from bot.models.circle import Circle
 from bot.models.contract import Contract
-from bot.models.report import Report
 from bot.models.user_state import UserState
 from bot.tasks import send_message_to_user_generic
 from settings.models import Settings

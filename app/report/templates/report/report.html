@@ -1,0 +1,121 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link type="image/x-icon" href="{% static 'report/img/diagram.png' %}" rel="shortcut icon">
+
+    <link type="Image/x-icon" href="{% static 'report/img/diagram.png' %}" rel="icon">
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+
+    <link rel="stylesheet" href="{% static 'flatpickr/flatpickr.min.css' %}">
+    <link rel="stylesheet" href="{% static 'flatpickr/theme.css' %}">
+
+    <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'fontawesomefree/css/fontawesome.min.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
+
+    <title>Отчет</title>
+</head>
+<body>
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mt-3">
+                <h5 class="card-header">Отчет</h5>
+                <div class="card-body">
+                    <form method="post">
+                        {% if form.errors %}
+                            {% for error in form.non_field_errors %}
+                                <div class="alert alert-danger alert-dismissible">
+                                    <h5><i class="icon fas fa-ban"></i>Ошибка ввода</h5>
+                                    {{ error }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="mb-3">
+                            <div class="mb-2">
+                                <label for="{{ form.date_start.id_for_label }}" style="user-select: none">
+                                    {{ form.date_start.label }}:
+                                </label>
+                                {{ form.date_start }}
+                            </div>
+                            <div class="mb-2">
+                                <label for="{{ form.date_end.id_for_label }}" style="user-select: none">
+                                    {{ form.date_end.label }}:
+                                </label>
+                                {{ form.date_end }}
+                            </div>
+                        </div>
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">Сформировать отчет</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% if report_data %}
+            <div class="col-12">
+                <div class="card mt-3">
+                    <h5 class="card-header" style="position: sticky; top: 0; background-color: #fff;">
+                        <data value="{{ date_start }}">{{ date_start }}</data>
+                        -
+                        <data value="{{ date_end }}">{{ date_end }}</data>
+                    </h5>
+                    <div class="card-body p-0">
+                        <h4 class="mb-3 p-3"
+                            style="position: sticky; top: 35px; z-index: 9; background-color: #e0e0e0"><i
+                                class="fa-solid fa-check"
+                                style="margin-right: 10px; color: var(--bs-success);"></i>
+                            Подходят под условия компенсации</h4>
+                        <div class="p-3">
+                            {% for accessed in report_data.accessed %}
+                                <h5>{{ accessed.name }}</h5>
+                                <p><b>Количество посещений: </b> {{ accessed.visits_count }}/{{ required_count }}</p>
+                                <a href="{{ accessed.contract }}" class="btn btn-outline-primary">Договор</a>
+                                <a href="{{ accessed.cheque }}" class="btn btn-outline-primary">Чек</a>
+                                <hr>
+
+                            {% endfor %}
+                        </div>
+                        <h4 class="mb-3 p-3"
+                            style="position: sticky; top: 35px; z-index: 10; background-color: #e0e0e0"><i
+                                class="fa-solid fa-close"
+                                style="margin-right: 10px; color: var(--bs-danger)"></i>
+                            Не подходят под условия компенсации</h4>
+                        <div class="p-3">
+                            {% for not_accessed in report_data.not_accessed %}
+                                <h5>{{ not_accessed.name }}</h5>
+                                <p><b>Причина: </b>{{ not_accessed.reason }}</p>
+                                <hr>
+
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script src="{% static 'bootstrap/bootstrap.bundle.min.js' %}"></script>
+<script src="{% static 'flatpickr/flatpickr.min.js' %}"></script>
+<script src="{% static 'fontawesomefree/js/fontawesome.js' %}"></script>
+<script src="{% static 'fontawesomefree/js/all.min.js' %}"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ru.js"></script>
+<script>
+    const fp = flatpickr(".date-picker", {
+        dateFormat: "d.m.Y",  // Формат даты
+        locale: "ru",         // Локализация на русский
+        monthSelectorType: "dropdown", // Использование выпадающих списков для смены месяца
+        yearSelectorType: "select",  // Использование выпадающего списка для выбора года
+        disableMobile: true
+    });
+</script>
+</body>
+</html>

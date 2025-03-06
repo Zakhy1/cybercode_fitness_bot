@@ -1,0 +1,141 @@
+/* Основные стили для body */
+body {
+    background: #EBF0F9;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+/* Стили для карточки входа */
+.login-card {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    width: 530px;
+    height: 674px;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.login-card h2 {
+    color: #333;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+/* Стили для формы */
+.form-control {
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 5px rgba(102, 126, 234, 0.5);
+    outline: none;
+}
+
+.btn-primary {
+    width: 450px;
+    height: 56px;
+    border-radius: 8px;
+    gap: 10px;
+    padding: 16px 32px;
+    background: #0A5BFF;
+    border: none;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Состояние при наведении */
+.btn-primary:hover {
+    background: #0949cc;
+    transform: translateY(-2px);
+}
+
+/* Состояние при нажатии */
+.btn-primary:active {
+    background: #0738a3;
+    transform: translateY(0);
+}
+
+/* Состояние отключенной кнопки */
+.btn-primary:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Стили для логотипа */
+.logo-img {
+    max-width: 100px;
+    height: auto;
+    display: inline-block;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.logo-img:hover {
+    transform: scale(1.1);
+}
+
+/* Стили для ошибок */
+.invalid-feedback {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Стили для футера */
+.footer-links {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.footer-links a {
+    color: #667eea;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: #764ba2;
+    text-decoration: underline;
+}
+
+.alert i {
+    color: #ff0707; /* Желтый цвет иконки */
+    font-size: 1.5rem; /* Размер иконки */
+    margin-right: 10px; /* Отступ справа */
+    animation: blink 1.5s infinite; /* Анимация мерцания */
+}
+@keyframes blink {
+    0%, 50%, 100% { opacity: 1; }
+    25%, 75% { opacity: 0.5; }
+}
+/* Анимация появления */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

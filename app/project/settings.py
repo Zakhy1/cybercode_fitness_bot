@@ -30,8 +30,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'fontawesomefree',
+
     'settings.apps.SettingsConfig',
     'bot.apps.BotConfig',
+    'report.apps.ReportConfig',
+    'users.apps.UsersConfig'
 ]
 
 MIDDLEWARE = [
@@ -49,7 +53,7 @@ ROOT_URLCONF = 'project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -100,7 +104,8 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
@@ -132,6 +137,10 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
 TELEGRAM_API_URL = "https://api.telegram.org/bot"
+
+LOGIN_URL = "users:login"
+LOGIN_REDIRECT_URL = "reports:report"
+LOGOUT_REDIRECT_URL = LOGIN_URL
 
 from project.unfold_config import UNFOLD
 import project.logging_settings

@@ -76,11 +76,16 @@
                         <div class="p-3">
                             {% for accessed in report_data.accessed %}
                                 <h5>{{ accessed.name }}</h5>
-                                <p><b>Количество посещений: </b> {{ accessed.visits_count }}/{{ required_count }}</p>
+                                <p>
+                                    <b>Количество посещений: </b>
+                                    <a href="{% url 'report:circle_history' accessed.id %}?date_start={{ date_start }}&date_end={{ date_end }}">{{ accessed.visits_count }}/{{ required_count }}</a>
+                                </p>
                                 <a href="{{ accessed.contract }}" class="btn btn-outline-primary">Договор</a>
-                                <a href="{{ accessed.cheque }}" class="btn btn-outline-primary">Чек</a>
+                                {% for cheque in accessed.cheques %}
+                                    <a href="{{ cheque.url }}" class="btn btn-outline-primary">Чек
+                                        за {{ cheque.month }}</a>
+                                {% endfor %}
                                 <hr>
-
                             {% endfor %}
                         </div>
                         <h4 class="mb-3 p-3"

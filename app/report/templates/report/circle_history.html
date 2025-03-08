@@ -1,0 +1,48 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link type="image/x-icon" href="{% static 'report/img/diagram.png' %}" rel="shortcut icon">
+
+    <link type="Image/x-icon" href="{% static 'report/img/diagram.png' %}" rel="icon">
+
+    <link rel="stylesheet" href="{% static 'bootstrap/bootstrap.min.css' %}">
+
+    <link rel="stylesheet" href="{% static 'flatpickr/flatpickr.min.css' %}">
+    <link rel="stylesheet" href="{% static 'flatpickr/theme.css' %}">
+
+    <link href="{% static 'fontawesomefree/css/fontawesome.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'fontawesomefree/css/fontawesome.min.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'fontawesomefree/css/brands.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'fontawesomefree/css/solid.css' %}" rel="stylesheet" type="text/css">
+
+    <title>История посещений</title>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mt-3">
+                <h5 class="card-header">История посещений</h5>
+                <div class="card-body">
+
+                        {% for object in object_list %}
+
+                            <div class="d-flex align-items-center mb-3" style="gap: 15px"><i class="fas fa-video"></i><a href="{{ object.file.url }}" class="ml-2">{{ object.uploaded_at }}</a></div>
+
+                        {% endfor %}
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+</body>
+</html>

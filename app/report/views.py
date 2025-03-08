@@ -116,7 +116,7 @@ class ReportView(LoginRequiredMixin, FormView):
                     month_key].uploaded_at:
                     cheques_by_month[month_key] = cheque
 
-            latest_contract = Contract.objects.latest('uploaded_at')
+            latest_contract = Contract.objects.filter(user=user).latest('uploaded_at')
             report["accessed"].append({
                 "id": user.id,
                 "name": user.get_name(),

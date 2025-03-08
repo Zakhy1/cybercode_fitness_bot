@@ -15,18 +15,17 @@ import requests
 
 class TelegramBotWebhookView(CSRFExemptMixin, View):
     def post(self, request):
-        if request.method == 'POST':
-            message = {}
-            try:
-                message = json.loads(request.body.decode('utf-8'))
-                dispatcher = TelegramBotDispatcher()
-                dispatcher.dispatch(message)
-            except Exception as e:
-                error_logger.error(
-                    f"Ошибка во время обработки сообщения: {e}\nСообщение: {message}\n")
-                return HttpResponse('error', status=500)
+        message = {}
+        try:
+            message = json.loads(request.body.decode('utf-8'))
+            dispatcher = TelegramBotDispatcher()
+            dispatcher.dispatch(message)
+            return HttpResponse('ok')
+        except Exception as e:
+            error_logger.error(
+                f"Ошибка во время обработки сообщения: {e}\nСообщение: {message}\n")
+            return HttpResponse('error', status=500)
 
-        return HttpResponse('ok')
 
 
 class TelegramBotSetwebhookView(View):

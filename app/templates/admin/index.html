@@ -1,0 +1,25 @@
+{% extends 'unfold/layouts/base_simple.html' %}
+
+{% load i18n %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block title %}
+    {% if subtitle %}
+        {{ subtitle }} |
+    {% endif %}
+
+    {{ title }} | {{ site_title|default:_('Django site admin') }}
+{% endblock %}
+
+{% block branding %}
+    КиберКод
+{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-2 gap-4">
+  <div class="bg-base-800 p-4">Блок 1</div>
+  <div class="bg-primary-500/80 p-4">Блок 2</div>
+</div>
+
+{% endblock %}

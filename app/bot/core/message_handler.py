@@ -146,7 +146,7 @@ class TelegramBotHandler:
             }])
 
         if latest_cheque:
-            date_time = convert_to_local_time(latest_contract.uploaded_at)
+            date_time = convert_to_local_time(latest_cheque.uploaded_at)
             inline_keyboard.append(
                 [{
                     "text": f"📥 Последний чек "

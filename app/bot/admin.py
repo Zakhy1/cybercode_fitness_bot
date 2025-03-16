@@ -18,6 +18,8 @@ admin.site.unregister(User)
 admin.site.unregister(Group)
 
 
+
+
 @admin.register(User)
 class UserAdmin(BaseUserAdmin, ModelAdmin):
     # Forms loaded from `unfold.forms`
@@ -33,19 +35,24 @@ class GroupAdmin(BaseGroupAdmin, ModelAdmin):
 
 @admin.register(UserState)
 class UserStateAdmin(ModelAdmin):
-    pass
+    list_display = ['name', 'email', 'state', 'is_registered']
+    list_filter = ['is_registered']
 
 
 @admin.register(Cheque)
-class ModelChequeAdmin(ModelAdmin):
-    pass
+class ChequeAdmin(ModelAdmin):
+    list_display = ['user', 'uploaded_at']
+    list_filter = ['user', 'uploaded_at']
 
 
 @admin.register(Contract)
 class ContractAdmin(ModelAdmin):
-    pass
+    list_display = ['user', 'uploaded_at']
+    list_filter = ['user', 'uploaded_at']
 
 
 @admin.register(Circle)
 class CircleAdmin(ModelAdmin):
-    pass
+    list_display = ['user', 'uploaded_at']
+    list_filter = ['user', 'uploaded_at']
+

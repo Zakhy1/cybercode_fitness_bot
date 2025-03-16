@@ -28,6 +28,8 @@ class ReportService:
         for user in users:
             user_dict, accessed = self.check_user(user, start_date, end_date,
                                                   params)
+            if user_dict == {} and accessed is False:
+                continue
             if accessed:
                 report['accessed'].append(user_dict)
             else:
@@ -44,7 +46,7 @@ class ReportService:
 
         if not user.is_registered:
             if user.name is None:
-                return
+                return {}, False
 
         user_has_contract = Contract.objects.filter(user=user).exists()
         if not user_has_contract:

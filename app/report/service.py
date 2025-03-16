@@ -78,18 +78,17 @@ class ReportService:
         for cheque in cheques:
             month_key = cheque.uploaded_at.strftime('%Y-%m')
             if month_key not in cheques_by_month or \
-                    cheque.uploaded_at > cheques_by_month[
-                month_key].uploaded_at:
+                    cheque.uploaded_at > cheques_by_month[month_key].uploaded_at:
                 cheques_by_month[month_key] = cheque
 
-        latest_contract = Contract.objects.filter(user=user).latest(
-            'uploaded_at')
+        latest_contract = Contract.objects.filter(user=user).order_by(
+            'uploaded_at').last()
 
         user_dict = {
             "id": user.id,
             "name": user.get_name(),
             "visits_count": user_circles_count,
-            "contract": f'{host_url}{latest_contract.file.url}',
+            "contract": f'{host_url}{latest_contract.file.url}' if user_has_contract else None,
             "cheques": [
                 {
                     "month": f"{months_names[cheque.uploaded_at.strftime('%m')]} "

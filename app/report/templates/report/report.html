@@ -100,18 +100,20 @@
                                     <b>Количество посещений: </b>
                                     <a href="{% url 'report:circle_history' not_accessed.id %}?date_start={{ date_start }}&date_end={{ date_end }}">{{ not_accessed.visits_count }}/{{ required_count }}</a>
                                 </p>
-                                <a href="{{ not_accessed.contract }}" class="btn btn-outline-primary">Договор</a>
+                                {% if not_accessed.contract %}
+                                    <a href="{{ not_accessed.contract }}" class="btn btn-outline-primary">Договор</a>
+                                {% endif %}
                                 {% for cheque in not_accessed.cheques %}
                                     <a href="{{ cheque.url }}" class="btn btn-outline-primary">Чек
                                         за {{ cheque.month }}</a>
                                 {% endfor %}
                                 <h6 class="mt-3">Причины отказа:</h6>
                                 <ul>
-                                {% for reason in  not_accessed.reasons %}
-                                	<li>
-                                        {{ reason }}
-                                    </li>
-                                {% endfor %}
+                                    {% for reason in  not_accessed.reasons %}
+                                        <li>
+                                            {{ reason }}
+                                        </li>
+                                    {% endfor %}
 
                                 </ul>
                                 <hr>

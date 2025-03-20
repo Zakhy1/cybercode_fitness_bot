@@ -64,10 +64,7 @@ def remind_about_cheque():
             try:
                 last_receipt = Cheque.objects.latest('uploaded_at')
             except Cheque.DoesNotExist:
-                send_message_to_user.delay(
-                    user.chat_id,
-                    "Пожалуйста, загрузите новый чек за текущий месяц!"
-                )
+                continue
             if not last_receipt or last_receipt.uploaded_at < last_month:
                 send_message_to_user.delay(
                     user.chat_id,

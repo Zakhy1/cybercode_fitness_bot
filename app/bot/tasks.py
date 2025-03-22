@@ -57,7 +57,7 @@ def send_message_to_user_generic(obj):
 @shared_task
 def remind_about_cheque():
     try:
-        last_month = now() - timedelta(days=30)
+        last_month = now().replace(day=1)
         users = UserState.objects.filter(is_registered=True)
 
         for user in users:
@@ -65,7 +65,7 @@ def remind_about_cheque():
                 last_receipt = Cheque.objects.latest('uploaded_at')
             except Cheque.DoesNotExist:
                 continue
-            if not last_receipt or last_receipt.uploaded_at < last_month:
+            if last_receipt.uploaded_at < last_month:
                 send_message_to_user.delay(
                     user.chat_id,
                     "Пожалуйста, загрузите новый чек за текущий месяц!"
